@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="SONIEN'S - Alta Costura e Design Autoral">
+    <title>SONIEN'S | Alta Costura</title>
+    
+    <!-- Favicon baseado no Selo SONIEN'S -->
+    <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="%230d0c0b" /><circle cx="50" cy="50" r="40" fill="none" stroke="%23f5eedc" stroke-width="3"/><circle cx="50" cy="50" r="25" fill="none" stroke="%23f5eedc" stroke-width="3"/><line x1="50" y1="10" x2="50" y2="90" stroke="%23f5eedc" stroke-width="3"/><text x="50" y="68" font-family="serif" font-size="48" fill="%23f5eedc" text-anchor="middle" font-weight="bold">S</text></svg>'>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- SONIEN'S Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400;1,600&family=Syncopate:wght@400;700&family=Inter:wght@200;300;400&family=Space+Mono:wght@400&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --cursor-size: 10px;
+            --cursor-trail-size: 40px;
+            /* Paleta Premium SONIEN'S */
+            --primary: #f5eedc; /* Creme/Bege */
+            --accent: #d4af37; /* Dourado/Bronze */
+            --bg-color: #0d0c0b; /* Fundo Chumbo/Preto Quente */
+            --glass-border: rgba(245, 238, 220, 0.15);
+        }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-color);
+            color: var(--primary);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden; 
+            height: 100vh; width: 100vw;
+            cursor: none !important;
+            touch-action: none;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        ::selection {
+            background-color: var(--accent);
+            color: #fff;
+        }
+
+        .font-display { font-family: 'Cormorant Garamond', serif; }
+        .font-tech { font-family: 'Syncopate', sans-serif; }
+        .font-mono { font-family: 'Space Mono', monospace; }
+
+        a, button, .cursor-pointer, .project-card-3d, .hover-trigger, select, input, textarea {
+            cursor: none !important;
+        }
+
+        /* Magnetic Utility */
+        .magnetic-btn {
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            will-change: transform;
+        }
+
+        #viewport {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            perspective: 1000px;
+            overflow: hidden; pointer-events: none; 
+            transition: opacity 1s ease;
+        }
+
+        section {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; 
+            transform-style: preserve-3d;
+            will-change: transform, opacity;
+            transition: opacity 0.4s ease;
+        }
+
+        section.active-section {
+            pointer-events: auto;
+            z-index: 40;
+        }
+
+        #work, #about, #contact, #footer-section { padding-top: 0; }
+
+        nav, .hud-element, .hud-line {
+            position: fixed; z-index: 50;
+            transition: opacity 1s ease;
+        }
+
+        #nav-links, #nav-cta {
+            transition: opacity 2s ease, transform 2s ease;
+        }
+
+        #mobile-menu {
+            position: fixed; inset: 0;
+            background: rgba(13, 12, 11, 0.98);
+            backdrop-filter: blur(20px); z-index: 49;
+            transform: translateY(-100%);
+            transition: transform 0.8s cubic-bezier(0.86, 0, 0.07, 1);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+        }
+        #mobile-menu.open { transform: translateY(0); }
+
+        .hamburger-line { 
+            width: 24px; height: 1px; background-color: var(--primary); 
+            transition: transform 0.4s cubic-bezier(0.86, 0, 0.07, 1); 
+        }
+        #hamburger-btn.open .hamburger-line:first-child { transform: rotate(45deg) translate(5px, 5px); }
+        #hamburger-btn.open .hamburger-line:last-child { transform: rotate(-45deg) translate(5px, -5px); }
+
+        .noise-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 9000; opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            animation: noise 0.2s infinite;
+        }
+        @keyframes noise {
+            0% { transform: translate(0,0); }
+            100% { transform: translate(5px,5px); }
+        }
+
+        /* Dual Cursor System */
+        .cursor-dot, .cursor-trail {
+            display: none; position: fixed; top: 0; left: 0;
+            border-radius: 50%; z-index: 10005; pointer-events: none;
+            mix-blend-mode: difference;
+            transform: translate(-50%, -50%);
+        }
+        
+        .cursor-dot {
+            width: var(--cursor-size); height: var(--cursor-size);
+            background-color: var(--primary); 
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+
+        .cursor-trail {
+            width: var(--cursor-trail-size); height: var(--cursor-trail-size);
+            border: 1px solid rgba(245, 238, 220, 0.5);
+            transition: width 0.3s, height 0.3s, border-color 0.3s;
+            z-index: 10004;
+        }
+
+        @media (hover: hover) and (pointer: fine) { 
+            .cursor-dot, .cursor-trail { display: block; } 
+        }
+
+        .solar-text-container { position: relative; display: inline-block; }
+        .solar-text { opacity: 0 !important; visibility: hidden !important; }
+        .solar-text.solar-active { opacity: 1 !important; visibility: visible !important; transition: opacity 0.1s; }
+        .solar-spark { color: var(--primary); text-shadow: 0 0 12px rgba(245, 238, 220, 0.6); opacity: 1 !important; }
+        .solar-dim { opacity: 0.3; color: var(--accent); }
+
+        .carousel-3d-wrapper {
+            position: relative; width: 100%; 
+            height: 350px; perspective: 2000px; 
+            display: flex; justify-content: center; align-items: center;
+        }
+        @media(min-width: 768px) { .carousel-3d-wrapper { height: 500px; } }
+
+        .carousel-3d-stage {
+            position: relative; width: 240px; height: 340px; 
+            transform-style: preserve-3d;
+        }
+        .project-card-3d {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(13, 12, 11, 0.95); border: 1px solid var(--glass-border);
+            padding: 1.5rem; display: flex; flex-direction: column;
+            cursor: none !important; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8); backface-visibility: hidden; 
+            overflow: hidden; user-select: none; -webkit-user-drag: none;
+        }
+        @media(min-width: 768px) {
+            .carousel-3d-stage { width: 340px; height: 460px; }
+            .project-card-3d { padding: 2rem; }
+        }
+        .project-card-3d:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.15);
+            transform: scale(1.02);
+        }
+        .card-image-container {
+            width: 100%; height: 150px; background: #111;
+            overflow: hidden; margin-bottom: 1rem; position: relative; flex-shrink: 0;
+        }
+        @media(min-width: 768px) { .card-image-container { height: 240px; } }
+
+        .card-image-container img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s;
+            filter: grayscale(80%) sepia(20%) brightness(0.8); -webkit-user-drag: none;
+        }
+        .project-card-3d:hover .card-image-container img {
+            transform: scale(1.08); filter: grayscale(0%) sepia(10%) brightness(1);
+        }
+
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-color); z-index: 10000;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.8s cubic-bezier(0.86, 0, 0.07, 1);
+        }
+        .loader-bar {
+            width: 0%; height: 1px; background: var(--accent);
+            transition: width 0.1s linear; box-shadow: 0 0 15px rgba(212,175,55,0.5); 
+        }
+
+        #isekai-modal {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95);
+            width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; overflow-x: hidden;
+            background: rgba(13, 12, 11, 0.95); border: 1px solid rgba(245,238,220,0.1);
+            backdrop-filter: blur(20px); z-index: 9999; padding: 2.5rem; opacity: 0; pointer-events: none;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.9); transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #isekai-modal.active { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+
+        .isekai-btn {
+            background: transparent; border: 1px solid var(--accent); color: var(--primary); 
+            padding: 1rem 2rem; font-family: 'Syncopate', sans-serif; font-size: 0.7rem; 
+            letter-spacing: 0.2em; cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+            width: 100%; margin-top: 2rem; position: relative; overflow: hidden;
+        }
+        .isekai-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: var(--accent); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: -1;
+        }
+        .isekai-btn:hover { color: #000; box-shadow: 0 0 30px rgba(212,175,55,0.2); }
+        .isekai-btn:hover::before { transform: translateX(100%); }
+
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(15px); 
+            z-index: 10001; display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.5s ease; padding: 20px;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: auto !important; }
+
+        .modal-content {
+            background: var(--bg-color); border: 1px solid rgba(245,238,220,0.1); max-width: 1000px; width: 100%; 
+            max-height: 90vh; overflow-y: auto; overflow-x: hidden; position: relative;
+            transform: translateY(30px) scale(0.98); transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+        }
+        @media(min-width: 768px) { .modal-content { flex-direction: row; } }
+        .modal-overlay.open .modal-content { transform: translateY(0) scale(1); }
+
+        .form-input {
+            width: 100%; background: transparent; border-bottom: 1px solid rgba(245,238,220,0.2);
+            border-top: 0; border-left: 0; border-right: 0; padding: 1rem 0; color: var(--primary); 
+            font-family: 'Inter', sans-serif; transition: border-color 0.3s; outline: none; border-radius: 0; 
+        }
+        .form-input:focus { border-color: var(--accent); }
+
+        .hud-element {
+            position: fixed; z-index: 8000; font-family: 'Space Mono', monospace;
+            color: rgba(245, 238, 220, 0.4); font-size: 9px; pointer-events: none; letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .hud-bl { bottom: 30px; left: 30px; }
+        .hud-br { bottom: 30px; right: 30px; text-align: right; }
+        .hud-tl { display: none; top: 100px; left: 30px; writing-mode: vertical-rl; transform: rotate(180deg); }
+        @media(min-width: 768px) { .hud-tl { display: block; } }
+
+        .hud-line { display: none; width: 1px; height: 15vh; background: rgba(245,238,220,0.15); position: fixed; right: 30px; top: 50%; transform: translateY(-50%); }
+        @media(min-width: 768px) { .hud-line { display: block; } }
+
+        #flash-overlay {
+            position: fixed; inset: 0; background: var(--primary); z-index: 9998;
+            opacity: 0; pointer-events: none; display: none;
+        }
+
+        .footer-shine-text {
+            color: transparent; 
+            -webkit-text-stroke: 1px rgba(245, 238, 220, 0.2);
+            background: linear-gradient(110deg, transparent 35%, rgba(212, 175, 55, 0.9) 50%, transparent 65%);
+            background-size: 200% auto;
+            -webkit-background-clip: text; background-clip: text;
+            animation: textShine 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            opacity: 0.9;
+        }
+        @keyframes textShine { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+
+        @media screen and (min-width: 1366px) and (max-width: 1920px) {
+            #service-img-right {
+                z-index: 20 !important;
+                pointer-events: none !important; 
+            }
+        }
+
+        /* Holographic Reveals */
+        .holo-container { position: relative; overflow: hidden; opacity: 0; }
+        .holo-active { animation: holoFadeIn 0.1s linear forwards; }
+        .holo-active .holo-mask { animation: holoScan 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .holo-scanline {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 2px;
+            background: var(--accent); box-shadow: 0 0 15px 2px rgba(212,175,55,0.8); z-index: 30; opacity: 0;
+        }
+        .holo-active .holo-scanline { animation: holoScanlineMove 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .holo-border-line { position: absolute; background: var(--accent); box-shadow: 0 0 8px rgba(212,175,55,0.6); opacity: 0; }
+        .line-top { top: 0; left: 0; width: 100%; height: 1px; transform: translateX(-100%); }
+        .line-right { top: 0; right: 0; width: 1px; height: 100%; transform: translateY(-100%); }
+        .line-bottom { bottom: 0; right: 0; width: 100%; height: 1px; transform: translateX(100%); }
+        .line-left { bottom: 0; left: 0; width: 1px; height: 100%; transform: translateY(100%); }
+        .holo-active .line-top { animation: snakeTop 2s linear 1.4s infinite; opacity: 1; }
+        .holo-active .line-right { animation: snakeRight 2s linear 1.9s infinite; opacity: 1; }
+        .holo-active .line-bottom { animation: snakeBottom 2s linear 2.4s infinite; opacity: 1; }
+        .holo-active .line-left { animation: snakeLeft 2s linear 2.9s infinite; opacity: 1; }
+
+        @keyframes holoFadeIn { to { opacity: 1; } }
+        @keyframes holoScan {
+            0% { height: 0%; filter: brightness(2) contrast(1.5) grayscale(1); }
+            100% { height: 100%; filter: brightness(1) contrast(1) grayscale(0); }
+        }
+        @keyframes holoScanlineMove { 0% { bottom: 0%; opacity: 1; } 95% { opacity: 1; } 100% { bottom: 100%; opacity: 0; } }
+        @keyframes snakeTop { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        @keyframes snakeRight { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
+        @keyframes snakeBottom { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        @keyframes snakeLeft { 0% { transform: translateY(100%); } 100% { transform: translateY(-100%); } }
+
+        @keyframes aetherFloat { 0%, 100% { transform: translateY(0px) scale(1); } 50% { transform: translateY(-12px) scale(1.03); } }
+        .aether-float { animation: aetherFloat 6s ease-in-out infinite; }
+
+        /* Estilo da Logo Inline */
+        .brand-logo-text {
+            font-family: 'Cormorant Garamond', serif;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body class="antialiased hidden-overflow no-scroll selection:bg-white selection:text-black">
+
+    <!-- HUD -->
+    <div class="hud-element hud-bl">
+        <div id="hud-coords">COLEÇÃO: ESSÊNCIA</div>
+        <div>ALFAIATARIA: <span id="network-status" style="color: var(--accent);">PREMIUM</span></div>
+    </div>
+    <div class="hud-element hud-br">
+        <div>ATELIER: <span id="crystal-count">ABERTO</span></div>
+        <div>ESTADO: <span id="hud-status">INATIVO</span></div>
+    </div>
+    <div class="hud-element hud-tl">
+        SONIEN'S // ALTA COSTURA
+    </div>
+    <div class="hud-line"></div>
+
+    <!-- PRELOADER -->
+    <div id="preloader">
+        <div class="flex flex-col items-center z-10 px-4 text-center">
+            <h1 class="text-4xl md:text-6xl mb-6 brand-logo-text text-white">SONIEN'S</h1>
+            <div class="flex flex-col items-center w-64">
+                <div class="w-full h-[1px] bg-gray-800 overflow-hidden mb-2 relative">
+                    <div id="loader-bar" class="loader-bar absolute top-0 left-0"></div>
+                </div>
+                <div class="flex justify-between w-full text-[10px] font-mono text-gray-500 uppercase">
+                    <span>A Preparar Coleção</span>
+                    <span id="loader-percent">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLASH OVERLAY -->
+    <div id="flash-overlay"></div>
+
+    <!-- INTRO MODAL -->
+    <div id="isekai-modal" role="dialog" aria-modal="true" aria-labelledby="isekai-title">
+        <div class="flex justify-between border-b border-white/10 pb-4 mb-6 text-[10px] font-mono tracking-widest text-gray-400 uppercase">
+            <span>Manifesto_Marca</span>
+            <span style="color: var(--accent);">Est. 2026</span>
+        </div>
+        <div class="font-display text-2xl md:text-4xl leading-relaxed text-gray-200 mb-8 w-full text-center md:text-left whitespace-normal">
+            <p id="isekai-text" class="solar-text" data-value="A verdadeira elegância é atemporal. 
+Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
+        </div>
+        <div class="flex justify-center md:justify-end">
+            <button id="enter-world-btn" aria-label="Descobrir Coleção" class="isekai-btn hover-trigger solar-text magnetic-btn" data-value="DESCOBRIR COLEÇÃO">DESCOBRIR COLEÇÃO</button>
+        </div>
+    </div>
+
+    <!-- BACKGROUND (Three.js) -->
+    <canvas id="webgl-canvas" class="fixed top-0 left-0 w-full h-full -z-10"></canvas>
+    
+    <!-- NOISE -->
+    <div class="noise-overlay"></div>
+
+    <!-- DUAL CURSOR -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-trail"></div>
+
+    <!-- MOBILE MENU -->
+    <div id="mobile-menu" aria-hidden="true">
+        <a href="#" class="text-4xl brand-logo-text mb-8 mobile-link solar-text text-white hover-trigger magnetic-btn" data-nav-to="1000" data-value="Coleções">Coleções</a>
+        <a href="#" class="text-4xl brand-logo-text mb-8 mobile-link solar-text text-white hover-trigger magnetic-btn" data-nav-to="2000" data-value="O Atelier">O Atelier</a>
+        <a href="#" class="text-4xl brand-logo-text mb-8 mobile-link solar-text text-white hover-trigger magnetic-btn" data-nav-to="3000" data-value="Contacto">Contacto</a>
+    </div>
+
+    <!-- NAVIGATION -->
+    <nav class="fixed top-0 w-full p-6 md:p-10 flex justify-between items-center z-50 opacity-0" id="main-nav">
+        <!-- Substituído AETHER por Logo SONIEN'S formatada -->
+        <div class="text-2xl font-bold brand-logo-text hover-trigger z-50 cursor-pointer magnetic-btn flex items-center gap-3" onclick="window.scrollToSection(0)">
+            <svg class="w-6 h-6" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="48" fill="transparent" stroke="currentColor" stroke-width="2"/>
+                <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" stroke-width="2"/>
+                <line x1="50" y1="15" x2="50" y2="85" stroke="currentColor" stroke-width="2"/>
+                <text x="50" y="65" font-family="serif" font-size="40" fill="currentColor" text-anchor="middle" font-weight="bold">S</text>
+            </svg>
+            <span style="letter-spacing: 0.15em;">SONIEN'S</span>
+        </div>
+        
+        <div id="nav-links" class="hidden md:flex gap-12 font-mono text-[10px] tracking-widest text-gray-400 opacity-0 pointer-events-none uppercase">
+            <a href="#" class="hover:text-white transition-colors hover-trigger magnetic-btn" onclick="window.scrollToSection(1000)">Coleções</a>
+            <a href="#" class="hover:text-white transition-colors hover-trigger magnetic-btn" onclick="window.scrollToSection(2000)">O Atelier</a>
+            <a href="#" class="hover:text-white transition-colors hover-trigger magnetic-btn" onclick="window.scrollToSection(3000)">Contacto</a>
+        </div>
+        
+        <button id="nav-cta" aria-label="Agendar Prova" class="hidden md:block border border-white/20 px-6 py-2 rounded-full text-[10px] font-mono tracking-widest hover:bg-white hover:text-black transition-colors duration-500 hover-trigger open-contact-btn opacity-0 pointer-events-none magnetic-btn uppercase">
+            Agendar Prova
+        </button>
+
+        <!-- HAMBURGER BUTTON -->
+        <button id="hamburger-btn" aria-label="Abrir Menu" aria-expanded="false" class="md:hidden z-50 flex flex-col gap-1.5 p-4 -m-4 hover-trigger magnetic-btn">
+            <div class="hamburger-line origin-center"></div>
+            <div class="hamburger-line origin-center"></div>
+        </button>
+    </nav>
+
+    <!-- 3D VIEWPORT -->
+    <div id="viewport">
+        <!-- HERO (Z = 0) -->
+        <section class="section-3d" data-z="0">
+            <div class="flex flex-col justify-center items-center px-6 text-center max-w-5xl">
+                <p class="font-mono text-gray-400 mb-6 text-xs tracking-[0.5em] solar-text uppercase" data-value="ALTA COSTURA & DESIGN">ALTA COSTURA & DESIGN</p>
+                
+                <div class="flex flex-col items-center mb-8 relative z-10 w-full">
+                    <h1 class="brand-logo-text text-[15vw] leading-[0.9] text-white mix-blend-overlay solar-text" data-value="Sonien's">Sonien's</h1>
+                    <h1 class="font-display italic text-[4vw] tracking-widest text-gray-300 mt-2 solar-text" data-value="A Essência do Estilo">A Essência do Estilo</h1>
+                </div>
+
+                <p class="hidden md:block max-w-2xl mx-auto text-center text-sm text-gray-400 font-light leading-relaxed mt-6 solar-text" 
+                   data-value="A convergência perfeita entre design autoral e materiais premium. Vestuário criado com mestria para transcender as tendências e celebrar a sua identidade.">
+                    A convergência perfeita entre design autoral e materiais premium. Vestuário criado com mestria para transcender as tendências e celebrar a sua identidade.
+                </p>
+
+                <p class="block md:hidden max-w-xs mx-auto text-center text-xs text-gray-400 font-light leading-relaxed mt-4 solar-text" 
+                   data-value="Sua Identidade Estampada com Estilo.">
+                    Sua Identidade Estampada com Estilo.
+                </p>
+                
+                <div class="absolute bottom-12 left-1/2 -translate-x-1/2">
+                    <div class="flex flex-col items-center gap-4 hover-trigger cursor-pointer magnetic-btn" onclick="window.scrollToSection(1000)">
+                        <span class="text-[9px] font-mono tracking-widest text-gray-500 uppercase">Explorar as Coleções</span>
+                        <div class="w-[1px] h-12 bg-gradient-to-b from-[#d4af37] to-transparent opacity-50"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROJECTS (Z = 1000) -->
+        <section class="section-3d" data-z="1000" id="work">
+            <div class="w-full flex flex-col items-center">
+                <div class="flex flex-col justify-center items-center mb-8 md:mb-12 gap-2 px-6 text-center pt-16 md:pt-0">
+                    <h2 class="text-4xl md:text-6xl font-display italic text-white solar-text" data-value="Peças de Assinatura">Peças de Assinatura</h2>
+                    <p class="font-mono text-gray-500 text-xs tracking-widest uppercase">Coleções Exclusivas</p>
+                </div>
+                
+                <div class="carousel-3d-wrapper">
+                    <div class="carousel-3d-stage" id="carousel-stage"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SERVICES (Z = 2000) -->
+        <section class="section-3d" data-z="2000" id="about">
+            <div id="service-img-left" class="holo-container hidden min-[1921px]:block absolute left-[10%] top-1/2 -translate-y-1/2 w-96 h-[32rem] border border-white/5 z-0 [perspective:1000px]">
+                <div class="holo-border-line line-top"></div><div class="holo-border-line line-right"></div>
+                <div class="holo-border-line line-bottom"></div><div class="holo-border-line line-left"></div>
+                <div class="holo-mask w-full h-full absolute bottom-0 left-0 overflow-hidden">
+                    <div class="holo-scanline"></div>
+                    <div class="service-img-inner w-full h-full transition-transform duration-100 ease-out">
+                        <img src="" alt="Detalhe do Atelier" class="w-full h-full object-cover opacity-80 mix-blend-screen aether-float">
+                    </div>
+                </div>
+            </div>
+
+            <div id="service-img-right" class="holo-container hidden md:block absolute right-[10%] top-1/2 -translate-y-1/2 w-96 h-[32rem] border border-white/5 z-0 [perspective:1000px]">
+                <div class="holo-border-line line-top"></div><div class="holo-border-line line-right"></div>
+                <div class="holo-border-line line-bottom"></div><div class="holo-border-line line-left"></div>
+                <div class="holo-mask w-full h-full absolute bottom-0 left-0 overflow-hidden">
+                    <div class="holo-scanline"></div>
+                    <div class="service-img-inner w-full h-full transition-transform duration-100 ease-out">
+                        <img src="" alt="Processo Criativo" class="w-full h-full object-cover opacity-80 mix-blend-screen aether-float">
+                    </div>
+                </div>
+            </div>
+
+            <div class="max-w-5xl w-full px-4 md:px-8 relative z-10">
+                <h2 class="text-[10px] font-mono text-gray-500 mb-12 tracking-[0.5em] border-b border-white/10 pb-4 uppercase">Nosso Atelier</h2>
+                <div class="space-y-0">
+                    <div class="service-item border-b border-white/10 py-10 cursor-pointer group hover:pl-4 transition-all duration-500 hover-trigger" onclick="toggleService(this)">
+                        <div class="flex justify-between items-baseline">
+                            <h3 class="text-4xl md:text-6xl font-display italic text-gray-400 group-hover:text-white transition-colors">Materiais Premium</h3>
+                            <span class="font-mono text-xs text-[#d4af37] opacity-60 group-hover:opacity-100">01</span>
+                        </div>
+                        <div class="service-desc max-h-0 overflow-hidden transition-all duration-500 ease-in-out opacity-0">
+                            <p class="pt-6 max-w-xl text-gray-400 font-light text-sm leading-relaxed solar-text" data-value="Tecidos selecionados meticulosamente. Das fibras de algodão orgânico à seda mais pura, garantimos um toque inconfundível e conforto absoluto.">
+                                Tecidos selecionados meticulosamente. Das fibras de algodão orgânico à seda mais pura, garantimos um toque inconfundível e conforto absoluto.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="service-item border-b border-white/10 py-10 cursor-pointer group hover:pl-4 transition-all duration-500 hover-trigger" onclick="toggleService(this)">
+                        <div class="flex justify-between items-baseline">
+                            <h3 class="text-4xl md:text-6xl font-display italic text-gray-400 group-hover:text-white transition-colors">Design Autoral</h3>
+                            <span class="font-mono text-xs text-[#d4af37] opacity-60 group-hover:opacity-100">02</span>
+                        </div>
+                        <div class="service-desc max-h-0 overflow-hidden transition-all duration-500 ease-in-out opacity-0">
+                            <p class="pt-6 max-w-xl text-gray-400 font-light text-sm leading-relaxed solar-text" data-value="Cada peça carrega o DNA SONIEN'S. Estampas criadas à mão e paletas neutras que oferecem versatilidade sem abrir mão do statement visual.">
+                                Cada peça carrega o DNA SONIEN'S. Estampas criadas à mão e paletas neutras que oferecem versatilidade sem abrir mão do statement visual.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="service-item border-b border-white/10 py-10 cursor-pointer group hover:pl-4 transition-all duration-500 hover-trigger" onclick="toggleService(this)">
+                        <div class="flex justify-between items-baseline">
+                            <h3 class="text-4xl md:text-6xl font-display italic text-gray-400 group-hover:text-white transition-colors">Corte Preciso</h3>
+                            <span class="font-mono text-xs text-[#d4af37] opacity-60 group-hover:opacity-100">03</span>
+                        </div>
+                        <div class="service-desc max-h-0 overflow-hidden transition-all duration-500 ease-in-out opacity-0">
+                            <p class="pt-6 max-w-xl text-gray-400 font-light text-sm leading-relaxed solar-text" data-value="A alfaiataria levada ao extremo do perfeccionismo. Caimentos impecáveis estudados exaustivamente para esculpir e valorizar a silhueta.">
+                                A alfaiataria levada ao extremo do perfeccionismo. Caimentos impecáveis estudados exaustivamente para esculpir e valorizar a silhueta.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT (Z = 3000) -->
+        <section class="section-3d" data-z="3000" id="contact">
+            <div class="text-center px-4">
+                <p class="font-mono text-gray-500 mb-8 text-xs tracking-widest solar-text uppercase" data-value="EXPERIMENTE O EXCLUSIVO">EXPERIMENTE O EXCLUSIVO</p>
+                <h2 class="text-5xl md:text-9xl font-display italic mb-12 hover-trigger text-white mix-blend-difference cursor-pointer open-contact-btn magnetic-btn inline-block">
+                    Agende <br> Uma Prova
+                </h2>
+                <div class="mt-4 flex justify-center">
+                    <button aria-label="Abrir Formulário de Atendimento" class="border border-[#d4af37]/50 text-[#d4af37] px-10 py-4 rounded-full text-xs font-mono tracking-widest hover:bg-[#d4af37] hover:text-black transition-colors duration-500 hover-trigger open-contact-btn magnetic-btn uppercase">
+                        Contactar Atelier
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER (Z = 4000) -->
+        <section class="section-3d" data-z="4000" id="footer-section">
+            <div class="flex flex-col items-center justify-center text-center gap-12 w-full px-6">
+                <div class="text-6xl brand-logo-text tracking-tighter footer-shine-text">SONIEN'S</div>
+                <div class="flex gap-12 items-center justify-center font-mono text-xs text-gray-400 uppercase">
+                    <a href="#" class="flex flex-col items-center gap-4 hover:text-[#d4af37] transition-colors hover-trigger magnetic-btn group">
+                        <i data-lucide="instagram" class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity"></i>
+                        <span>Instagram</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center gap-4 hover:text-[#d4af37] transition-colors hover-trigger magnetic-btn group">
+                        <i data-lucide="map-pin" class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity"></i>
+                        <span>Boutique</span>
+                    </a>
+                </div>
+                <div class="flex flex-col gap-2 font-mono text-[10px] text-gray-500 uppercase tracking-widest mt-12">
+                    <p>Paris • Milão • São Paulo</p>
+                    <p>© 2026 Sonien's Premium Apparel. Direitos Reservados.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- PROJECT MODAL -->
+    <div id="project-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-content">
+            <button id="close-modal" aria-label="Fechar Detalhes da Peça" class="absolute top-6 right-6 z-20 text-white mix-blend-difference hover-trigger magnetic-btn">
+                <i data-lucide="x" class="w-8 h-8"></i>
+            </button>
+            <div class="w-full md:w-1/2 h-64 md:h-auto bg-black relative overflow-hidden group">
+                <img id="modal-image" src="" class="w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-700" alt="Imagem da Peça">
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0d0c0b] via-transparent to-transparent"></div>
+            </div>
+            <div class="w-full md:w-1/2 p-10 md:p-16 flex flex-col justify-center bg-[#0d0c0b] min-w-0 overflow-hidden">
+                <div class="flex items-center gap-4 mb-6">
+                    <span id="modal-year" class="text-[10px] font-mono border border-[#d4af37]/30 px-2 py-1 text-gray-300"></span>
+                    <span id="modal-tag" class="text-[10px] font-mono text-[#d4af37] uppercase tracking-widest"></span>
+                </div>
+                <h2 id="modal-title" class="text-4xl md:text-5xl font-display italic mb-8 text-white line-clamp-2"></h2>
+                <p id="modal-desc" class="text-gray-400 font-light leading-relaxed text-sm mb-12 break-words whitespace-normal w-full"></p>
+                <button class="self-start text-xs font-mono border-b border-[#d4af37]/50 pb-1 hover:border-[#d4af37] hover:pl-4 transition-all duration-300 hover-trigger magnetic-btn text-[#d4af37] uppercase">
+                    Adicionar à Wishlist
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTACT FORM MODAL -->
+    <div id="contact-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="contact-title">
+        <div class="modal-content max-w-4xl bg-[#0d0c0b] border border-white/10 p-0 flex flex-row overflow-hidden relative"> 
+            <button id="close-contact" aria-label="Fechar Contacto" class="absolute top-6 right-6 text-white hover:rotate-90 transition-transform hover-trigger z-50 magnetic-btn">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <div class="hidden md:flex w-24 bg-[#d4af37]/5 border-r border-white/5 flex-col justify-center items-center py-10 relative overflow-hidden">
+                 <h2 id="contact-title" class="brand-logo-text text-4xl tracking-widest text-[#d4af37]/20 whitespace-nowrap absolute" style="writing-mode: vertical-rl; transform: rotate(180deg);">SONIEN'S</h2>
+            </div>
+            <div class="flex-1 p-8 md:p-12 flex flex-col justify-center">
+                <h3 class="text-3xl font-display italic text-white mb-2">Atendimento VIP</h3>
+                <p class="text-gray-500 font-mono text-xs mb-10 uppercase">Permita-nos conhecer as suas preferências.</p>
+                <div class="space-y-8 w-full">
+                    <div><input id="form-name" type="text" aria-label="O seu nome" class="form-input hover-trigger" placeholder="NOME COMPLETO"></div>
+                    <div><input id="form-email" type="email" aria-label="Email de contacto" class="form-input hover-trigger" placeholder="EMAIL DE CONTACTO"></div>
+                    <div><textarea id="form-msg" aria-label="Peça de interesse ou detalhes" class="form-input hover-trigger" rows="1" placeholder="QUAL PEÇA DESEJA EXPERIMENTAR?"></textarea></div>
+                    <button id="submit-whatsapp" aria-label="Enviar Mensagem" class="w-full bg-[#d4af37] text-black font-mono font-bold text-xs py-4 hover:bg-white transition-colors tracking-widest mt-4 hover-trigger magnetic-btn uppercase">
+                        Solicitar Agendamento
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // GLOBAL STATE
+        let introCompleted = false;
+        let scrollZ = 0;
+        let targetScrollZ = 0;
+        const sectionDistance = 1000;
+        const maxScrollZ = 4000;
+        let particlesMeshGlobal;
+        let lastScrollTime = 0;
+        const scrollCooldown = 1300; 
+        
+        // --- SERVICES IMAGES DATA (Tailoring & Fabric details) ---
+        const serviceImagesData = [
+            ["https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=1000", "https://images.unsplash.com/photo-1618220179428-22790b46a0eb?q=80&w=1000"], // Premium Fabrics
+            ["https://images.unsplash.com/photo-1558693155-22530d9931b6?q=80&w=1000", "https://images.unsplash.com/photo-1596464716127-f2a82984de30?q=80&w=1000"], // Design Autoral
+            ["https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?q=80&w=1000", "https://images.unsplash.com/photo-1584286595398-a59f21d313f5?q=80&w=1000"]  // Corte Preciso
+        ];
+
+        // DATA - Adaptação para Coleções de Roupas SONIEN'S
+        const projects = [
+            {
+                title: "Coleção Essência",
+                desc: "Criatividade com Estilo. Linhas minimalistas e tecidos em tons neutros que representam a fundação do guarda-roupa contemporâneo.",
+                year: "INVERNO '26", tag: "NEUTRAL & VERSÁTIL",
+                image: "https://images.unsplash.com/photo-1599839619722-39751411ea63?q=80&w=2370&auto=format&fit=crop" 
+            },
+            {
+                title: "Linha Signature",
+                desc: "Peças de edição limitada com os nossos selos metálicos e cortes audaciosos. O expoente máximo da identidade SONIEN'S.",
+                year: "CÁPSULA '26", tag: "PREMIUM LIMITADO",
+                image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2670&auto=format&fit=crop" 
+            },
+            {
+                title: "Coleção Autoral",
+                desc: "A sua ideia, a sua estampa. Uma colaboração exclusiva onde a arte encontra a moda. Detalhes desenhados e estampados à mão.",
+                year: "ESTÚDIO '26", tag: "BESPOKE ART",
+                image: "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2670&auto=format&fit=crop" 
+            },
+            {
+                title: "Inkstyle Series",
+                desc: "Contrastes profundos. O preto absoluto encontra bordados e texturas ricas. Uma abordagem moderna ao luxo noturno.",
+                year: "OUTONO '26", tag: "CONTEMPORÂNEO",
+                image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=2670&auto=format&fit=crop" 
+            },
+            {
+                title: "Clássicos Sentine",
+                desc: "Tributo à alfaiataria tradicional com um caimento moderno impecável. Casacos pesados e tricôs desenvolvidos para resistir ao tempo.",
+                year: "PERMANENTE", tag: "HERITAGE",
+                image: "https://images.unsplash.com/photo-1559551409-dadc959f76b8?q=80&w=2670&auto=format&fit=crop" 
+            }
+        ];
+
+        // --- FULL SOUND MANAGER ---
+        const SoundManager = {
+            ctx: null, masterGain: null, ambientNodes: [],
+            
+            init: function() {
+                if (!this.ctx) {
+                    const AC = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AC();
+                    this.masterGain = this.ctx.createGain();
+                    // Aumentado o volume master significativamente (de 0.8 para 1.5)
+                    this.masterGain.gain.value = 1.5; 
+                    this.masterGain.connect(this.ctx.destination);
+                }
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+            },
+
+            playAmbient: function() {
+                if (!this.ctx) return;
+                try {
+                    this.stopAmbient();
+                    const osc1 = this.ctx.createOscillator();
+                    osc1.type = 'sine'; osc1.frequency.value = 45; 
+                    const gain1 = this.ctx.createGain(); gain1.gain.value = 0.25; // Aumentado
+                    osc1.connect(gain1).connect(this.masterGain); osc1.start();
+                    
+                    const osc2 = this.ctx.createOscillator();
+                    osc2.type = 'triangle'; osc2.frequency.value = 48; 
+                    const gain2 = this.ctx.createGain(); gain2.gain.value = 0.12; // Aumentado
+                    osc2.connect(gain2).connect(this.masterGain); osc2.start();
+
+                    const bufferSize = this.ctx.sampleRate * 2;
+                    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    let lastOut = 0;
+                    for (let i = 0; i < bufferSize; i++) {
+                        const white = Math.random() * 2 - 1;
+                        data[i] = (lastOut + (0.02 * white)) / 1.02;
+                        lastOut = data[i];
+                        data[i] *= 2.5; 
+                    }
+                    const noise = this.ctx.createBufferSource(); noise.buffer = buffer; noise.loop = true;
+                    const noiseFilter = this.ctx.createBiquadFilter(); noiseFilter.type = 'lowpass'; noiseFilter.frequency.value = 300;
+                    const noiseGain = this.ctx.createGain(); noiseGain.gain.value = 0.08; // Aumentado
+                    noise.connect(noiseFilter).connect(noiseGain).connect(this.masterGain); noise.start();
+                    this.ambientNodes.push(osc1, osc2, gain1, gain2, noise, noiseFilter, noiseGain);
+                } catch(e) {}
+            },
+
+            stopAmbient: function() {
+                this.ambientNodes.forEach(node => { try { if(node.stop) node.stop(); node.disconnect(); } catch(e){} });
+                this.ambientNodes = [];
+            },
+
+            playTyping: function() {
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+                osc.frequency.setValueAtTime(150 + Math.random() * 50, now); osc.type = 'sine'; 
+                // Aumentado ganho de digitação
+                gain.gain.setValueAtTime(0.06, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03); 
+                osc.connect(gain).connect(this.masterGain); osc.start(); osc.stop(now + 0.03);
+            },
+
+            playHover: function() {
+                if(!this.ctx) return;
+                const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+                osc.frequency.setValueAtTime(200, this.ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(220, this.ctx.currentTime + 0.1);
+                // Aumentado zumbido de hover
+                gain.gain.setValueAtTime(0.08, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.1);
+                osc.connect(gain).connect(this.masterGain); osc.start(); osc.stop(this.ctx.currentTime + 0.1);
+            },
+
+            playClick: function() {
+                if(!this.ctx) return;
+                const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+                osc.type = 'sine'; osc.frequency.setValueAtTime(120, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.1);
+                // Aumentado o impacto do clique
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.1);
+                osc.connect(gain).connect(this.masterGain); osc.start(); osc.stop(this.ctx.currentTime + 0.1);
+            },
+
+            playWarp: function() {
+                if(!this.ctx) return;
+                const bufferSize = this.ctx.sampleRate * 0.8;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+                const noise = this.ctx.createBufferSource(); noise.buffer = buffer;
+                const filter = this.ctx.createBiquadFilter(); filter.type = 'bandpass'; filter.Q.value = 0.5;
+                filter.frequency.setValueAtTime(150, this.ctx.currentTime);
+                filter.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.3); 
+                filter.frequency.exponentialRampToValueAtTime(150, this.ctx.currentTime + 0.6); 
+                const gain = this.ctx.createGain(); gain.gain.setValueAtTime(0, this.ctx.currentTime);
+                // Aumentado o deslizar de seda (Scroll)
+                gain.gain.linearRampToValueAtTime(0.15, this.ctx.currentTime + 0.3);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.6);
+                noise.connect(filter).connect(gain).connect(this.masterGain); noise.start();
+            },
+
+            playSupernova: function() {
+                if (!this.ctx) return;
+                const t = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator(); const oscGain = this.ctx.createGain();
+                osc.type = 'sine'; osc.frequency.setValueAtTime(100, t); osc.frequency.exponentialRampToValueAtTime(150, t + 2.0); 
+                // Aumentado o acorde inicial
+                oscGain.gain.setValueAtTime(0, t); oscGain.gain.linearRampToValueAtTime(0.4, t + 0.5); oscGain.gain.exponentialRampToValueAtTime(0.001, t + 3.0); 
+                osc.connect(oscGain).connect(this.masterGain); osc.start(t); osc.stop(t + 3.5);
+            },
+
+            playTick: function() {
+                if(!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.03);
+                // Aumentado o Tick do carrossel
+                gain.gain.setValueAtTime(0.06, this.ctx.currentTime); 
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.03);
+                osc.connect(gain).connect(this.masterGain);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.03);
+            }
+        };
+
+        // --- SOLAR REVEAL ---
+        const glyphs = "█▓▒░<>/"; 
+        function solarReveal(element) {
+            const originalText = element.dataset.value || element.innerText;
+            if(!element.dataset.value) element.dataset.value = originalText;
+            
+            element.classList.add('solar-active');
+            element.innerText = '';
+            
+            const chars = originalText.split('');
+            const spans = chars.map(char => {
+                const span = document.createElement('span');
+                if(char === ' ' || char === '\n') {
+                    span.innerHTML = char === '\n' ? '<br>' : ' ';
+                    element.appendChild(span);
+                    return null;
+                }
+                span.innerText = glyphs[Math.floor(Math.random() * glyphs.length)];
+                span.className = 'solar-dim';
+                element.appendChild(span);
+                return span;
+            });
+
+            let frame = 0;
+            const interval = setInterval(() => {
+                frame++;
+                if(Math.random() > 0.8) SoundManager.playTyping(); 
+                
+                spans.forEach((span, i) => {
+                    if(!span) return;
+                    const revealPoint = (i / spans.length) * 20;
+                    if(frame > revealPoint) {
+                        if(frame < revealPoint + 5) {
+                            span.innerText = glyphs[Math.floor(Math.random() * glyphs.length)];
+                            span.className = 'solar-spark';
+                        } else {
+                            span.innerText = chars[i];
+                            span.className = '';
+                            span.style.opacity = 1;
+                            span.style.color = '';
+                        }
+                    }
+                });
+                if(frame > 50) clearInterval(interval);
+            }, 40);
+        }
+
+        // --- THREE.JS ---
+        function initThreeJS() {
+            const canvas = document.getElementById('webgl-canvas');
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x0d0c0b, 0.0015); // Cor do fog atualizada para o fundo escuro
+
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 6000); 
+            
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: "high-performance" });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            const particlesCount = 2000;
+            const geometry = new THREE.BufferGeometry();
+            const posArray = new Float32Array(particlesCount * 3);
+            const originalPosArray = new Float32Array(particlesCount * 3);
+            const randomArray = new Float32Array(particlesCount);
+            const colorArray = new Float32Array(particlesCount * 3);
+            
+            // Cores baseadas na paleta da SONIEN'S: Creme e Dourado
+            const color1 = new THREE.Color(0xf5eedc);
+            const color2 = new THREE.Color(0xd4af37);
+
+            const tunnelLength = 6000; 
+
+            for(let i=0; i<particlesCount; i++) {
+                const i3 = i * 3;
+                const x = (Math.random() - 0.5) * 600; 
+                const y = (Math.random() - 0.5) * 600;
+                const z = (Math.random() - 0.5) * tunnelLength;
+                
+                posArray[i3] = x; posArray[i3+1] = y; posArray[i3+2] = z;
+                originalPosArray[i3] = x; originalPosArray[i3+1] = y; originalPosArray[i3+2] = z;
+                randomArray[i] = Math.random();
+
+                const mixedColor = color1.clone().lerp(color2, Math.random() * 0.5);
+                colorArray[i3] = mixedColor.r; colorArray[i3+1] = mixedColor.g; colorArray[i3+2] = mixedColor.b;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 0.9, vertexColors: true, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending
+            });
+
+            particlesMeshGlobal = new THREE.Points(geometry, material);
+            scene.add(particlesMeshGlobal);
+
+            let mouseX = 0, mouseY = 0;
+            let targetRotationX = 0, targetRotationY = 0;
+
+            document.addEventListener('mousemove', e => {
+                mouseX = (e.clientX - window.innerWidth/2);
+                mouseY = (e.clientY - window.innerHeight/2);
+            });
+
+            const clock = new THREE.Clock();
+
+            function animate() {
+                const time = clock.getElapsedTime();
+                const positions = geometry.attributes.position.array;
+                
+                scrollZ += (targetScrollZ - scrollZ) * 0.05;
+                camera.position.z = -scrollZ;
+                
+                camera.position.x += (mouseX * 0.05 - camera.position.x) * 0.05;
+                camera.position.y += (-mouseY * 0.05 - camera.position.y) * 0.05;
+
+                targetRotationY = (mouseX / window.innerWidth) * 0.2;
+                targetRotationX = (mouseY / window.innerHeight) * 0.2;
+                camera.rotation.y += (targetRotationY - camera.rotation.y) * 0.05;
+                camera.rotation.x += (targetRotationX - camera.rotation.x) * 0.05;
+                camera.rotation.z += (mouseX * 0.0001 - camera.rotation.z) * 0.05; 
+
+                const winW = window.innerWidth || 1; 
+                const winH = window.innerHeight || 1;
+                const forceX = (mouseX / winW) * 70; 
+                const forceY = -(mouseY / winH) * 70;
+
+                for(let i=0; i<particlesCount; i++) {
+                    const i3 = i*3;
+                    let z = positions[i3+2];
+                    const relativeZ = z - camera.position.z;
+                    
+                    if (relativeZ > 1000) {
+                        positions[i3+2] -= tunnelLength; 
+                    } else if (relativeZ < -(tunnelLength - 1000)) {
+                        positions[i3+2] += tunnelLength;
+                    }
+
+                    // Movimento mais ondulado, luxuoso
+                    const driftX = Math.sin(time * 0.8 + randomArray[i] * 10) * 4;
+                    const driftY = Math.cos(time * 0.6 + randomArray[i] * 10) * 4;
+                    const distFactor = 1 + (randomArray[i] * 0.5);
+
+                    let targetX = originalPosArray[i3] - (forceX * distFactor) + driftX;
+                    let targetY = originalPosArray[i3+1] - (forceY * distFactor) + driftY;
+
+                    if (!isNaN(targetX) && !isNaN(targetY)) {
+                        positions[i3] += (targetX - positions[i3]) * 0.1;
+                        positions[i3+1] += (targetY - positions[i3+1]) * 0.1;
+                    }
+                }
+                geometry.attributes.position.needsUpdate = true;
+                
+                particlesMeshGlobal.rotation.z = time * 0.01; // Giro mais lento e elegante
+
+                updateHTMLSections();
+                updateCarousel3D();
+                updateDualCursor();
+
+                document.getElementById('hud-coords').innerText = `COLEÇÃO: ESSÊNCIA | PROFUNDIDADE: ${Math.floor(scrollZ)} PX`;
+                
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            }
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                initCarousel(); 
+            });
+        }
+
+        // --- DUAL CURSOR LOGIC ---
+        let cursorX = window.innerWidth / 2, cursorY = window.innerHeight / 2;
+        let trailX = cursorX, trailY = cursorY;
+        let isHovering = false;
+
+        function initDualCursor() {
+            const dot = document.querySelector('.cursor-dot');
+            const trail = document.querySelector('.cursor-trail');
+            
+            if(window.matchMedia("(pointer: fine)").matches) {
+                document.addEventListener('mousemove', e => {
+                    cursorX = e.clientX;
+                    cursorY = e.clientY;
+                    dot.style.left = cursorX + 'px';
+                    dot.style.top = cursorY + 'px';
+                });
+                
+                document.addEventListener('mouseover', e => {
+                    if(e.target.closest('.hover-trigger')) {
+                        isHovering = true;
+                        dot.style.transform = "translate(-50%, -50%) scale(0)";
+                        trail.style.width = "60px";
+                        trail.style.height = "60px";
+                        trail.style.backgroundColor = "rgba(212, 175, 55, 0.15)";
+                        trail.style.borderColor = "transparent";
+                        SoundManager.playHover();
+                    } else {
+                        isHovering = false;
+                        dot.style.transform = "translate(-50%, -50%) scale(1)";
+                        trail.style.width = "var(--cursor-trail-size)";
+                        trail.style.height = "var(--cursor-trail-size)";
+                        trail.style.backgroundColor = "transparent";
+                        trail.style.borderColor = "rgba(245, 238, 220, 0.5)";
+                    }
+                });
+            }
+        }
+
+        function updateDualCursor() {
+            if(!window.matchMedia("(pointer: fine)").matches) return;
+            const trail = document.querySelector('.cursor-trail');
+            
+            trailX += (cursorX - trailX) * 0.15;
+            trailY += (cursorY - trailY) * 0.15;
+            
+            trail.style.left = trailX + 'px';
+            trail.style.top = trailY + 'px';
+        }
+
+        // --- MAGNETIC BUTTONS LOGIC ---
+        function initMagneticButtons() {
+            const magneticElements = document.querySelectorAll('.magnetic-btn');
+            
+            magneticElements.forEach(elem => {
+                elem.addEventListener('mousemove', (e) => {
+                    const rect = elem.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    
+                    const strength = elem.classList.contains('text-5xl') ? 0.15 : 0.3;
+                    
+                    elem.style.transform = `translate(${x * strength}px, ${y * strength}px)`;
+                    elem.style.transition = 'none'; 
+                });
+                
+                elem.addEventListener('mouseleave', () => {
+                    elem.style.transform = `translate(0px, 0px)`;
+                    elem.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                });
+            });
+        }
+
+        // --- 3D CAROUSEL ---
+        function initCarousel() {
+            const stage = document.getElementById('carousel-stage');
+            stage.innerHTML = '';
+            const radius = window.innerWidth < 768 ? 200 : 380;
+            const angleStep = 360 / projects.length;
+
+            projects.forEach((proj, i) => {
+                const el = document.createElement('div');
+                el.className = 'project-card-3d';
+                el.style.transform = `rotateY(${i * angleStep}deg) translateZ(${radius}px)`;
+                
+                el.innerHTML = `
+                    <div class="card-image-container">
+                        <img src="${proj.image}" alt="${proj.title}">
+                    </div>
+                    <div class="flex flex-col flex-1 w-full min-w-0">
+                        <div class="flex justify-between items-end mt-4 mb-3 w-full">
+                            <div class="flex-1 min-w-0 pr-4">
+                                <span class="text-[9px] font-mono text-[#d4af37] tracking-wider block mb-1 truncate">${proj.tag}</span>
+                                <h3 class="text-2xl font-display italic text-white truncate">${proj.title}</h3>
+                            </div>
+                            <span class="text-[9px] font-mono text-gray-500 flex-shrink-0">${proj.year}</span>
+                        </div>
+                        <div class="w-full relative flex-1 min-h-0">
+                        <p class="text-[11px] text-gray-400 font-light leading-relaxed break-words whitespace-normal line-clamp-4">
+                            ${proj.desc}
+                        </p>
+                    </div>
+                </div>
+            `;
+            el.onclick = (e) => {
+                if (!introCompleted) return;
+                
+                if (dragDistanceCarousel > 5) {
+                    e.preventDefault(); e.stopPropagation(); return;
+                }
+                SoundManager.playClick();
+                document.getElementById('modal-title').innerText = proj.title;
+                document.getElementById('modal-desc').innerText = proj.desc;
+                document.getElementById('modal-year').innerText = proj.year;
+                document.getElementById('modal-tag').innerText = proj.tag;
+                document.getElementById('modal-image').src = proj.image;
+                
+                const modal = document.getElementById('project-modal');
+                modal.classList.add('open');
+                
+                setTimeout(() => solarReveal(document.getElementById('modal-title')), 300);
+                setTimeout(() => solarReveal(document.getElementById('modal-desc')), 500);
+            };
+            stage.appendChild(el);
+        });
+    }
+
+    let carouselRot = 0;
+    let targetCarouselRot = 0;
+    let isDraggingCarousel = false;
+    let startXCarousel = 0;
+    let autoRotateCarousel = true;
+    let autoRotateTimeout = null;
+    let dragDistanceCarousel = 0;
+    let lastTickRot = 0; 
+
+    function updateCarousel3D() {
+        const stage = document.getElementById('carousel-stage');
+        if(!stage) return;
+        
+        if (autoRotateCarousel && !stage.matches(':hover') && !isDraggingCarousel) {
+            targetCarouselRot += 0.08; // Rotação ligeiramente mais suave
+        }
+
+        const delta = (targetCarouselRot - carouselRot) * 0.08;
+        carouselRot += delta;
+        stage.style.transform = `rotateY(${-carouselRot}deg)`;
+
+        if (Math.abs(carouselRot - lastTickRot) > 15) {
+            if (isDraggingCarousel || Math.abs(delta) > 0.5) {
+                SoundManager.playTick();
+            }
+            lastTickRot = carouselRot;
+        }
+    }
+
+    function initCarouselInteraction() {
+        const carouselWrapper = document.querySelector('.carousel-3d-wrapper');
+        if (!carouselWrapper) return;
+        
+        const startDrag = (e) => {
+            isDraggingCarousel = true;
+            dragDistanceCarousel = 0;
+            startXCarousel = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+            autoRotateCarousel = false;
+            clearTimeout(autoRotateTimeout);
+        };
+
+        const moveDrag = (e) => {
+            if (!isDraggingCarousel) return;
+            if (e.cancelable && e.type.includes('touch')) e.preventDefault();
+            
+            const x = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+            const walk = (x - startXCarousel) * 0.8; 
+            targetCarouselRot -= walk; 
+            startXCarousel = x;
+            dragDistanceCarousel += Math.abs(walk);
+        };
+
+        const endDrag = () => {
+            if (!isDraggingCarousel) return;
+            isDraggingCarousel = false;
+            autoRotateTimeout = setTimeout(() => { autoRotateCarousel = true; }, 4000);
+        };
+
+        carouselWrapper.addEventListener('mousedown', startDrag);
+        window.addEventListener('mousemove', moveDrag);
+        window.addEventListener('mouseup', endDrag);
+
+        carouselWrapper.addEventListener('touchstart', startDrag, {passive: true});
+        window.addEventListener('touchmove', moveDrag, {passive: false});
+        window.addEventListener('touchend', endDrag);
+    }
+
+    // --- Z-SCROLL & HTML SECTIONS ---
+    function updateHTMLSections() {
+            if(!introCompleted) return;
+            const sections = document.querySelectorAll('.section-3d');
+            sections.forEach(sec => {
+                const z = parseFloat(sec.dataset.z);
+                const dist = z - scrollZ;
+                
+                if(dist > -800 && dist < 1200) {
+                    sec.style.display = 'flex';
+                    let opacity = 0, blur = 0, scale = 1;
+                    
+                    if(dist >= 0) {
+                        const progress = 1 - (dist / 1200);
+                        opacity = Math.pow(progress, 3); 
+                        scale = 0.8 + (0.2 * progress);
+                        blur = (1-progress) * 10;
+                    } else {
+                        const progress = Math.abs(dist) / 800;
+                        opacity = 1 - progress;
+                        scale = 1 + progress;
+                        blur = progress * 20;
+                    }
+                    sec.style.opacity = opacity;
+                    sec.style.transform = `scale(${scale})`;
+                    sec.style.filter = `blur(${blur}px)`;
+                    
+                    if(opacity > 0.5) {
+                        sec.classList.add('active-section');
+                        if(sec.dataset.revealed !== 'true') {
+                            sec.querySelectorAll('.solar-text').forEach(solarReveal);
+                            sec.dataset.revealed = 'true';
+                        }
+                    } else {
+                        sec.classList.remove('active-section');
+                    }
+                } else {
+                    sec.style.display = 'none';
+                    sec.dataset.revealed = 'false';
+                }
+            });
+        }
+
+        // --- INPUT HANDLING ---
+        function initScroll() {
+            window.addEventListener('wheel', e => {
+                if(!introCompleted) return;
+                const now = Date.now();
+                if (now - lastScrollTime < scrollCooldown) return;
+                if (Math.abs(e.deltaY) < 30) return;
+                
+                if(e.deltaY > 0 && targetScrollZ < maxScrollZ) {
+                    targetScrollZ += sectionDistance;
+                    lastScrollTime = now; SoundManager.playWarp();
+                } else if(e.deltaY < 0 && targetScrollZ > 0) {
+                    targetScrollZ -= sectionDistance;
+                    lastScrollTime = now; SoundManager.playWarp();
+                }
+            }, { passive: true });
+
+            window.addEventListener('keydown', e => {
+                if(!introCompleted) return;
+                const now = Date.now();
+                if (now - lastScrollTime < scrollCooldown) return; 
+
+                if(e.key === 'ArrowDown') { 
+                    if(targetScrollZ < maxScrollZ) { 
+                        targetScrollZ += sectionDistance; 
+                        lastScrollTime = now; SoundManager.playWarp(); 
+                    } 
+                }
+                if(e.key === 'ArrowUp') { 
+                    if(targetScrollZ > 0) { 
+                        targetScrollZ -= sectionDistance; 
+                        lastScrollTime = now; SoundManager.playWarp(); 
+                    } 
+                }
+            });
+
+            let touchStartY = 0;
+            window.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, {passive: true});
+            window.addEventListener('touchend', e => {
+                if(!introCompleted) return;
+                const now = Date.now();
+                if (now - lastScrollTime < scrollCooldown) return;
+
+                const touchEndY = e.changedTouches[0].clientY;
+                const diff = touchStartY - touchEndY;
+                
+                if(Math.abs(diff) > 50) {
+                    if(diff > 0 && targetScrollZ < maxScrollZ) {
+                        targetScrollZ += sectionDistance;
+                        lastScrollTime = now; SoundManager.playWarp();
+                    } else if(diff < 0 && targetScrollZ > 0) {
+                        targetScrollZ -= sectionDistance;
+                        lastScrollTime = now; SoundManager.playWarp();
+                    }
+                }
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (window.innerWidth < 768) return;
+                const x = (e.clientX / window.innerWidth - 0.5) * 2; 
+                const y = (e.clientY / window.innerHeight - 0.5) * 2; 
+                
+                const leftImg = document.querySelector('#service-img-left .service-img-inner');
+                const rightImg = document.querySelector('#service-img-right .service-img-inner');
+                
+                if (leftImg && rightImg) {
+                    leftImg.style.transform = `perspective(1000px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg) translateZ(25px)`;
+                    rightImg.style.transform = `perspective(1000px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg) translateZ(25px)`;
+                }
+            });
+        }
+
+        window.scrollToSection = (z) => {
+            targetScrollZ = z;
+            SoundManager.playWarp();
+        };
+
+        window.toggleService = (el) => {
+            SoundManager.playClick();
+            const desc = el.querySelector('.service-desc');
+            const isOpen = desc.style.maxHeight;
+            
+            document.querySelectorAll('.service-desc').forEach(d => { d.style.maxHeight = null; d.style.opacity = 0; });
+            
+            const siblings = Array.from(el.parentNode.children).filter(child => child.nodeType === 1); 
+            const index = siblings.indexOf(el);
+
+            const imgL = document.querySelector('#service-img-left img');
+            const imgR = document.querySelector('#service-img-right img');
+            const contL = document.getElementById('service-img-left');
+            const contR = document.getElementById('service-img-right');
+            const innerL = contL ? contL.querySelector('.service-img-inner img') : null;
+            const innerR = contR ? contR.querySelector('.service-img-inner img') : null;
+
+            if(!isOpen) {
+                desc.style.maxHeight = desc.scrollHeight + "px";
+                desc.style.opacity = 1;
+                solarReveal(desc.querySelector('.solar-text'));
+
+                if (contL && contR && serviceImagesData[index]) {
+                    if(innerL) innerL.src = serviceImagesData[index][0];
+                    if(innerR) innerR.src = serviceImagesData[index][1];
+                    
+                    contL.classList.remove('holo-active'); contR.classList.remove('holo-active');
+                    void contL.offsetWidth; 
+                    contL.classList.add('holo-active'); contR.classList.add('holo-active');
+                    
+                    contL.style.opacity = 1; contR.style.opacity = 1;
+                    SoundManager.playWarp();
+                }
+            } else {
+                if (contL && contR) {
+                    contL.classList.remove('holo-active'); contR.classList.remove('holo-active');
+                    contL.style.opacity = 0; contR.style.opacity = 0;
+                }
+            }
+        };
+
+        // --- INIT SEQUENCE ---
+        window.addEventListener('load', () => {
+            lucide.createIcons();
+            initThreeJS();
+            initCarousel();
+            initCarouselInteraction(); 
+            initScroll();
+            initDualCursor();
+            initMagneticButtons();
+            
+            // Hamburger
+            const btn = document.getElementById('hamburger-btn');
+            const menu = document.getElementById('mobile-menu');
+            btn.onclick = () => {
+                SoundManager.playClick();
+                menu.classList.toggle('open');
+                btn.classList.toggle('open');
+                btn.setAttribute('aria-expanded', btn.classList.contains('open'));
+                
+                if(menu.classList.contains('open')) {
+                    menu.querySelectorAll('.mobile-link').forEach((link, i) => {
+                        setTimeout(() => solarReveal(link), i * 100);
+                    });
+                }
+            };
+            menu.querySelectorAll('.mobile-link').forEach(link => {
+                link.onclick = (e) => {
+                    e.preventDefault();
+                    menu.classList.remove('open'); btn.classList.remove('open');
+                    btn.setAttribute('aria-expanded', 'false');
+                    window.scrollToSection(parseInt(link.dataset.navTo));
+                };
+            });
+
+            // Fake Preload
+            let p = 0;
+            const bar = document.getElementById('loader-bar');
+            const txt = document.getElementById('loader-percent');
+            const interval = setInterval(() => {
+                p += Math.floor(Math.random() * 5);
+                if(p > 100) p = 100;
+                bar.style.width = p + "%";
+                txt.innerText = p + "%";
+                if(p === 100) {
+                    clearInterval(interval);
+                    document.getElementById('preloader').style.opacity = 0;
+                    setTimeout(() => {
+                        document.getElementById('preloader').style.display = 'none';
+                        document.getElementById('isekai-modal').classList.add('active');
+                        solarReveal(document.getElementById('isekai-text'));
+                        setTimeout(() => { solarReveal(document.getElementById('enter-world-btn')); }, 1200);
+                    }, 800);
+                }
+            }, 30);
+            
+            // Enter World
+            document.getElementById('enter-world-btn').addEventListener('click', () => {
+                SoundManager.init();
+                SoundManager.playSupernova(); SoundManager.playAmbient();   
+                
+                const flash = document.getElementById('flash-overlay');
+                flash.style.display = 'block'; flash.style.opacity = 1;
+                document.getElementById('isekai-modal').classList.remove('active');
+                
+                setTimeout(() => {
+                    introCompleted = true;
+                    document.getElementById('main-nav').style.opacity = 1;
+                    updateHTMLSections();
+                    
+                    const hero = document.querySelector('.section-3d[data-z="0"]');
+                    hero.querySelectorAll('.solar-text').forEach(solarReveal);
+                    
+                    flash.style.transition = "opacity 0.8s ease-out";
+                    flash.style.opacity = 0;
+                    setTimeout(() => flash.style.display = 'none', 800);
+                }, 100);
+            });
+            
+            // Close Modals
+            document.getElementById('close-modal').onclick = () => document.getElementById('project-modal').classList.remove('open');
+            document.getElementById('close-contact').onclick = () => document.getElementById('contact-modal').classList.remove('open');
+            document.querySelectorAll('.open-contact-btn').forEach(btn => {
+                btn.onclick = () => document.getElementById('contact-modal').classList.add('open');
+            });
+
+            // WHATSAPP SUBMIT
+            document.getElementById('submit-whatsapp').addEventListener('click', () => {
+                SoundManager.playClick();
+                if(SoundManager.playSupernova) SoundManager.playSupernova();
+
+                const name = document.getElementById('form-name').value || "Cliente VIP";
+                const email = document.getElementById('form-email').value || "Não informado";
+                const msg = document.getElementById('form-msg').value || "Desejo agendar uma prova no atelier.";
+
+                const flash = document.getElementById('flash-overlay');
+                if (flash) {
+                    flash.style.display = 'block'; void flash.offsetWidth;
+                    flash.style.transition = 'opacity 0.05s ease-out'; flash.style.opacity = 1;
+                }
+
+                document.getElementById('contact-modal').classList.remove('open');
+                document.getElementById('project-modal').classList.remove('open');
+                
+                const viewport = document.getElementById('viewport'); if(viewport) viewport.style.opacity = '0';
+                const nav = document.getElementById('main-nav'); if(nav) nav.style.opacity = '0';
+                const footer = document.getElementById('footer-section'); if(footer) footer.style.opacity = '0';
+
+                setTimeout(() => {
+                    if(flash) { flash.style.transition = "opacity 1.0s ease-in-out"; flash.style.opacity = 0; }
+                }, 100);
+
+                setTimeout(() => {
+                    window.scrollToSection(0);
+                    if(viewport) viewport.style.opacity = '1';
+                    if(nav) nav.style.opacity = '1';
+                    if(footer) footer.style.opacity = '1';
+                    if(flash) flash.style.display = 'none';
+
+                    const navLinks = document.getElementById('nav-links');
+                    const navCta = document.getElementById('nav-cta');
+                    if(navLinks) {
+                        navLinks.classList.remove('opacity-0', 'pointer-events-none');
+                        navLinks.querySelectorAll('a').forEach(link => solarReveal(link));
+                    }
+                    if(navCta) navCta.classList.remove('opacity-0', 'pointer-events-none');
+
+                    const phone = "5532988212111"; 
+                    const text = `Olá SONIEN'S! Sou ${name} (${email}).\n\n${msg}`;
+                    const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+                    window.open(url, '_blank');
+
+                }, 1500); 
+            });
+        });
+    </script>
+</body>
+</html>
