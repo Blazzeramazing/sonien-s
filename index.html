@@ -687,6 +687,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
     <script>
         // GLOBAL STATE
         let introCompleted = false;
+        let isDedicatedPageOpen = false; // <-- Nova variável de estado
         let scrollZ = 0;
         let targetScrollZ = 0;
         const sectionDistance = 1000;
@@ -1164,7 +1165,8 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 document.getElementById('dp-color').value = "";
                 document.getElementById('dp-msg').value = "";
                 
-                // Mostrar a Página Dedicada (Overlay SPA)
+                // Mostrar a Página Dedicada e bloquear scroll principal
+                isDedicatedPageOpen = true; 
                 const page = document.getElementById('dedicated-page');
                 page.style.display = 'block';
                 // Forçar reflow para a transição funcionar
@@ -1293,7 +1295,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         // --- INPUT HANDLING ---
         function initScroll() {
             window.addEventListener('wheel', e => {
-                if(!introCompleted) return;
+                if(!introCompleted || isDedicatedPageOpen) return; // Bloqueia o scroll se a página estiver aberta
                 const now = Date.now();
                 if (now - lastScrollTime < scrollCooldown) return;
                 if (Math.abs(e.deltaY) < 30) return;
@@ -1308,7 +1310,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             }, { passive: true });
 
             window.addEventListener('keydown', e => {
-                if(!introCompleted) return;
+                if(!introCompleted || isDedicatedPageOpen) return; // Bloqueia as setas do teclado
                 const now = Date.now();
                 if (now - lastScrollTime < scrollCooldown) return; 
 
@@ -1329,7 +1331,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             let touchStartY = 0;
             window.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, {passive: true});
             window.addEventListener('touchend', e => {
-                if(!introCompleted) return;
+                if(!introCompleted || isDedicatedPageOpen) return; // Bloqueia o swipe em mobile
                 const now = Date.now();
                 if (now - lastScrollTime < scrollCooldown) return;
 
@@ -1496,6 +1498,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             // Botão "Voltar" da Página Dedicada
             document.getElementById('btn-back-page').addEventListener('click', () => {
                 SoundManager.playClick();
+                isDedicatedPageOpen = false; // Liberta o scroll principal ao fechar
                 const page = document.getElementById('dedicated-page');
                 page.style.opacity = 0;
                 page.style.pointerEvents = 'none';
@@ -1520,6 +1523,8 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                     alert("Por favor, selecione Tamanho, Cor e descreva a Ideia da Estampa para prosseguir.");
                     return;
                 }
+
+                isDedicatedPageOpen = false; // Liberta o scroll após submissão
 
                 // Flash Effect
                 const flash = document.getElementById('flash-overlay');
