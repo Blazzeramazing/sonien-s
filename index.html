@@ -82,9 +82,10 @@
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
             opacity: 0; pointer-events: none; 
+            visibility: hidden; /* OTIMIZAÇÃO: Evita Reflows caros em vez de display: none */
             transform-style: preserve-3d;
             will-change: transform, opacity;
-            transition: opacity 0.4s ease;
+            /* OTIMIZAÇÃO: Removida a transição CSS que conflituava com as atualizações JS a 60fps */
         }
 
         section.active-section {
@@ -1281,51 +1282,89 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         window.addEventListener('touchend', endDrag);
     }
 
-    // --- Z-SCROLL & HTML SECTIONS ---
+    // Variável Global para o Timeout de Revelação
+    const revealTimeouts = {};
+
+    // --- Z-SCROLL & HTML SECTIONS OTIMIZADOS ---
     function updateHTMLSections() {
             if(!introCompleted) return;
             const sections = document.querySelectorAll('.section-3d');
+            
+            // OTIMIZAÇÃO: Deteta se é um scroll de salto rápido (ex: click no logo)
+            const isJumping = Math.abs(targetScrollZ - scrollZ) > 800;
+
             sections.forEach(sec => {
                 const z = parseFloat(sec.dataset.z);
                 const dist = z - scrollZ;
                 
                 if(dist > -800 && dist < 1200) {
-                    sec.style.display = 'flex';
+                    // OTIMIZAÇÃO: visibility invés de display:none poupa milhares de cálculos de Reflow
+                    sec.style.visibility = 'visible'; 
+                    
                     let opacity = 0, blur = 0, scale = 1;
                     
                     if(dist >= 0) {
                         const progress = 1 - (dist / 1200);
                         opacity = Math.pow(progress, 3); 
                         scale = 0.8 + (0.2 * progress);
-                        blur = (1-progress) * 10;
+                        // Corta o desfoque completamente em velocidade alta
+                        blur = isJumping ? 0 : (1-progress) * 10; 
                     } else {
                         const progress = Math.abs(dist) / 800;
                         opacity = 1 - progress;
                         scale = 1 + progress;
-                        blur = progress * 20;
+                        blur = isJumping ? 0 : progress * 20;
                     }
-                    sec.style.opacity = opacity;
-                    sec.style.transform = `scale(${scale})`;
-                    sec.style.filter = `blur(${blur}px)`;
+                    
+                    // OTIMIZAÇÃO: toFixed(3) evita alocação pesada de memória nas strings dinâmicas
+                    sec.style.opacity = opacity.toFixed(3);
+                    sec.style.transform = `scale(${scale.toFixed(3)})`;
+                    
+                    // OTIMIZAÇÃO: Não ativa o filtro a menos que seja notável visualmente (> 0.5px) e não seja em alta velocidade
+                    if (blur > 0.5 && !isJumping) {
+                        sec.style.filter = `blur(${blur.toFixed(1)}px)`;
+                    } else {
+                        sec.style.filter = 'none';
+                    }
                     
                     if(opacity > 0.5) {
                         sec.classList.add('active-section');
                         if(sec.dataset.revealed !== 'true') {
-                            // Executa as animações de todos os textos, EXCETO os do card do carrossel
-                            sec.querySelectorAll('.solar-text:not(.card-solar-text)').forEach(solarReveal);
-                            sec.dataset.revealed = 'true';
                             
-                            // Permite que os cards voltem a ser animados quando saimos e entramos na secção novamente
-                            if (sec.id === 'work') {
-                                sec.querySelectorAll('.project-card-3d').forEach(c => c.dataset.revealed = 'false');
+                            // OTIMIZAÇÃO: Debounce - Só decodifica se ficar parado 250ms (ignora no voo rápido)
+                            if (!revealTimeouts[z]) {
+                                revealTimeouts[z] = setTimeout(() => {
+                                    if (sec.classList.contains('active-section')) {
+                                        // Executa as animações de todos os textos, EXCETO os do card do carrossel
+                                        sec.querySelectorAll('.solar-text:not(.card-solar-text)').forEach(solarReveal);
+                                        sec.dataset.revealed = 'true';
+                                        
+                                        // Permite que os cards voltem a ser animados quando saimos e entramos na secção novamente
+                                        if (sec.id === 'work') {
+                                            sec.querySelectorAll('.project-card-3d').forEach(c => c.dataset.revealed = 'false');
+                                        }
+                                    }
+                                    revealTimeouts[z] = null;
+                                }, 250); 
                             }
                         }
                     } else {
                         sec.classList.remove('active-section');
+                        if (revealTimeouts[z]) {
+                            clearTimeout(revealTimeouts[z]);
+                            revealTimeouts[z] = null;
+                        }
                     }
                 } else {
-                    sec.style.display = 'none';
+                    sec.style.visibility = 'hidden';
+                    sec.style.opacity = '0';
+                    sec.style.filter = 'none';
                     sec.dataset.revealed = 'false';
+                    sec.classList.remove('active-section');
+                    if (revealTimeouts[z]) {
+                        clearTimeout(revealTimeouts[z]);
+                        revealTimeouts[z] = null;
+                    }
                 }
             });
         }
