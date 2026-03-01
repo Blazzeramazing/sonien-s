@@ -27,6 +27,17 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
+        /* --- REMOVER BARRA DE ROLAGEM GLOBALMENTE --- */
+        ::-webkit-scrollbar {
+            display: none; /* Chrome, Safari e Opera */
+            width: 0px;
+            background: transparent;
+        }
+        * {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE e Edge */
+        }
+
         :root {
             --cursor-size: 10px;
             --cursor-trail-size: 40px;
