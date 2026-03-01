@@ -906,7 +906,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         // --- FULL SOUND MANAGER COM SUPORTE A BANDA SONORA ---
         const SoundManager = {
             ctx: null, masterGain: null, ambientNodes: [],
-            themeMusicSource: null, themeMusicGain: null,
+            themeAudioObj: null, // NOVO: Objeto de Áudio HTML5 Nativo
             
             init: function() {
                 if (!this.ctx) {
@@ -919,50 +919,52 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 if (this.ctx.state === 'suspended') this.ctx.resume();
             },
 
-            // Função para Tocar Música Tema via URL (Carregamento em Buffer)
-            playThemeMusic: async function(url) {
-                if (!this.ctx) return;
-                this.stopThemeMusic(); // Garante que a anterior para
+            // Função para Tocar Música Tema (HTML5 Audio contorna bloqueios de CORS)
+            playThemeMusic: function(url) {
+                this.stopThemeMusic(); 
                 
                 try {
-                    this.themeMusicGain = this.ctx.createGain();
-                    this.themeMusicGain.gain.value = 0; 
-                    this.themeMusicGain.connect(this.masterGain);
-
-                    const response = await fetch(url);
-                    const arrayBuffer = await response.arrayBuffer();
-                    const audioBuffer = await this.ctx.decodeAudioData(arrayBuffer);
-
-                    this.themeMusicSource = this.ctx.createBufferSource();
-                    this.themeMusicSource.buffer = audioBuffer;
-                    this.themeMusicSource.loop = true; 
-                    this.themeMusicSource.connect(this.themeMusicGain);
+                    this.themeAudioObj = new Audio(url);
+                    this.themeAudioObj.loop = true;
+                    this.themeAudioObj.volume = 0; // Começa no zero para o Fade In
                     
-                    this.themeMusicSource.start(0);
-                    // Fade in cinematográfico de 3 segundos
-                    this.themeMusicGain.gain.linearRampToValueAtTime(0.4, this.ctx.currentTime + 3);
+                    this.themeAudioObj.play().then(() => {
+                        // Fade in cinematográfico suave
+                        let vol = 0;
+                        const fadeInterval = setInterval(() => {
+                            vol += 0.02;
+                            if (vol >= 0.4) {
+                                clearInterval(fadeInterval);
+                                if(this.themeAudioObj) this.themeAudioObj.volume = 0.4;
+                            } else {
+                                if(this.themeAudioObj) this.themeAudioObj.volume = vol;
+                            }
+                        }, 100);
+                    }).catch(e => {
+                        console.warn("Navegador bloqueou ou não encontrou o áudio:", e);
+                    });
                 } catch (err) {
-                    console.warn("Música Tema não carregada:", err);
+                    console.warn("Erro ao tentar tocar a Música Tema:", err);
                 }
             },
 
-            // Função para Parar a Música Tema Suavemente
+            // Função para Parar a Música Tema Suavemente (Fade Out)
             stopThemeMusic: function() {
-                if (this.themeMusicSource && this.themeMusicGain) {
-                    const t = this.ctx.currentTime;
-                    // Previne estalos cancelando valores antigos e forçando fade out
-                    this.themeMusicGain.gain.cancelScheduledValues(t);
-                    this.themeMusicGain.gain.setValueAtTime(this.themeMusicGain.gain.value, t);
-                    this.themeMusicGain.gain.linearRampToValueAtTime(0.001, t + 2);
+                if (this.themeAudioObj) {
+                    let vol = this.themeAudioObj.volume;
+                    const audioToStop = this.themeAudioObj; // Guarda a referência localmente
+                    this.themeAudioObj = null; // Liberta a global imediatamente
                     
-                    this.themeMusicSource.stop(t + 2);
-                    
-                    setTimeout(() => {
-                        if(this.themeMusicSource) this.themeMusicSource.disconnect();
-                        if(this.themeMusicGain) this.themeMusicGain.disconnect();
-                        this.themeMusicSource = null;
-                        this.themeMusicGain = null;
-                    }, 2100);
+                    const fadeInterval = setInterval(() => {
+                        vol -= 0.05;
+                        if (vol <= 0) {
+                            clearInterval(fadeInterval);
+                            audioToStop.pause();
+                            audioToStop.currentTime = 0;
+                        } else {
+                            audioToStop.volume = vol;
+                        }
+                    }, 100);
                 }
             },
 
