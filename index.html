@@ -38,7 +38,6 @@
             --my: 0;
         }
 
-        /* OTIMIZAÇÃO DE TRANSIÇÃO: Permite que a mudança de tema (Cores) seja suave */
         body, #dedicated-page, .modal-content {
             transition: background-color 1s ease, color 1s ease;
         }
@@ -147,6 +146,19 @@
             40% { transform: translate(-2px, -2px); opacity: 0.04; }
             60% { transform: translate(2px, 2px); opacity: 0.06; }
             80% { transform: translate(2px, -2px); opacity: 0.03; }
+        }
+
+        /* EFEITO ATMOSFÉRICO DE FUMAÇA (NOVO) */
+        @keyframes smokeDrift {
+            0% { transform: translate3d(0, 0, 0) scale(2); opacity: 0.05; }
+            50% { opacity: 0.15; }
+            100% { transform: translate3d(-5%, -15%, 0) scale(2.5); opacity: 0.05; }
+        }
+        .animate-smoke {
+            animation: smokeDrift 20s ease-in-out infinite alternate;
+            will-change: transform, opacity;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.015' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            filter: blur(20px) contrast(2) saturate(0);
         }
 
         .cursor-dot, .cursor-trail {
@@ -307,7 +319,6 @@
         .footer-shine-text {
             color: transparent; 
             -webkit-text-stroke: 1px rgba(245, 238, 220, 0.2);
-            /* Usamos currentColor no gradiente indiretamente via var para theme */
             background: linear-gradient(110deg, transparent 35%, var(--accent) 50%, transparent 65%);
             background-size: 200% auto;
             -webkit-background-clip: text; background-clip: text;
@@ -652,18 +663,16 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             <div class="brand-logo-text text-xl tracking-widest text-[var(--accent)]" aria-hidden="true">SONIEN'S</div>
         </div>
 
-        <div class="max-w-7xl mx-auto px-6 py-12 md:py-20 flex flex-col gap-16 md:gap-24">
+        <div class="max-w-7xl mx-auto px-6 py-12 md:py-20 flex flex-col gap-16 md:gap-24 relative z-10">
             
             <div class="flex flex-col items-center text-center">
                 <span id="page-tag" class="text-[10px] font-mono text-[var(--accent)] border border-[var(--accent)]/30 px-3 py-1 uppercase tracking-widest mb-6 inline-block solar-text transition-colors duration-1000" aria-live="polite"></span>
                 <h2 id="page-title" class="text-5xl md:text-8xl font-display italic text-[var(--primary)] mb-8 solar-text transition-colors duration-1000" aria-live="polite"></h2>
             </div>
             
-            <!-- ALTERADO: Estrutura que suporta imagem, vídeo nativo E iframe do Vimeo -->
             <div class="w-full h-[50vh] md:h-[70vh] overflow-hidden border border-white/10 relative group bg-[#0d0c0b]">
                 <img id="page-image" src="" class="absolute inset-0 w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" alt="Fotografia de arte da coleção">
                 <video id="page-video" src="" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105 hidden pointer-events-none"></video>
-                <!-- NOVO: Iframe preparado para cobrir o fundo com escala de 115% para esconder barras pretas laterais -->
                 <iframe id="page-iframe" src="" frameborder="0" allow="autoplay; fullscreen" class="absolute inset-0 w-full h-full scale-[1.15] grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-125 hidden pointer-events-none"></iframe>
             </div>
 
@@ -689,7 +698,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 <h3 class="text-3xl md:text-4xl font-display italic text-[var(--primary)] mb-2 transition-colors duration-1000">Personalizar Peça</h3>
                 <p class="text-gray-500 font-mono text-[10px] mb-10 uppercase tracking-widest">Camisetas Estampadas Premium</p>
                 
-                <div class="space-y-6 w-full">
+                <div class="space-y-6 w-full relative z-20">
                     <div>
                         <label for="dp-name" class="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-2 block">Seu Nome / Contato</label>
                         <input id="dp-name" tabindex="0" type="text" class="form-input hover-trigger" placeholder="Nome Completo">
@@ -731,6 +740,16 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             </div>
         </div>
         
+        <!-- ECLIPSE FX OVERLAY -->
+        <div id="eclipse-fx" class="fixed inset-0 pointer-events-none z-[10005] hidden opacity-0 transition-opacity duration-1000">
+            <!-- Luar Avermelhado -->
+            <div class="absolute top-0 left-0 w-full h-[60vh] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#9b111e]/50 via-[#9b111e]/10 to-transparent mix-blend-screen"></div>
+            <!-- Fumaça -->
+            <div class="absolute inset-0 opacity-20 mix-blend-screen animate-smoke pointer-events-none"></div>
+            <!-- Container de Faíscas -->
+            <div id="sparks-container" class="absolute inset-0 overflow-hidden pointer-events-none"></div>
+        </div>
+
         <div class="h-20 w-full"></div>
     </div>
 
@@ -767,45 +786,41 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
     </div>
 
     <script>
-        // CONFIGURAÇÕES GLOBAIS E DE TEMAS
         let introCompleted = false;
         let isDedicatedPageOpen = false; 
         let scrollZ = 0;
         let targetScrollZ = 0;
         const sectionDistance = 1000;
         const maxScrollZ = 4000;
-        let particlesGeometryGlobal; // OTIMIZADO: Global para permitir mudança de cor em tempo real
-        let randomArrayGlobal; // Guarda as variações iniciais
+        let particlesGeometryGlobal; 
+        let randomArrayGlobal; 
         let lastScrollTime = 0;
         const scrollCooldown = 1300; 
 
-        // SISTEMA DE TEMAS (CSS VARIÁVEIS & THREE.JS)
         const themes = {
             default: {
-                primary: '#f5eedc', // Creme
-                accent: '#d4af37',  // Dourado
-                bg: '#0d0c0b',      // Preto Quente
+                primary: '#f5eedc', 
+                accent: '#d4af37',  
+                bg: '#0d0c0b',      
                 particle1: 0xf5eedc,
                 particle2: 0xd4af37
             },
             berserk: {
-                primary: '#e5e5e5', // Cinza pálido
-                accent: '#9b111e',  // Vermelho sangue escuro
-                bg: '#050303',      // Preto abissal
-                particle1: 0x9b111e, // Partículas de sangue
-                particle2: 0x333333  // Partículas de cinzas
+                primary: '#e5e5e5', 
+                accent: '#9b111e',  
+                bg: '#050303',      
+                particle1: 0x9b111e, 
+                particle2: 0x333333  
             }
         };
 
         function applyTheme(themeName) {
             const theme = themes[themeName] || themes.default;
             
-            // 1. Atualiza as Variáveis CSS globais (O CSS lida com a transição fluida)
             document.documentElement.style.setProperty('--primary', theme.primary);
             document.documentElement.style.setProperty('--accent', theme.accent);
             document.documentElement.style.setProperty('--bg-color', theme.bg);
 
-            // 2. Atualiza as Partículas do WebGL em Tempo Real
             if (particlesGeometryGlobal && randomArrayGlobal) {
                 const colorArray = particlesGeometryGlobal.attributes.color.array;
                 const c1 = new THREE.Color(theme.particle1);
@@ -822,7 +837,64 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             }
         }
         
-        // CONFIGURAÇÕES EMAILJS
+        // EFEITOS ESPECIAIS (FAÍSCAS)
+        const EclipseFX = {
+            interval: null,
+            start: function() {
+                const fx = document.getElementById('eclipse-fx');
+                const sparks = document.getElementById('sparks-container');
+                if(!fx || !sparks) return;
+                fx.classList.remove('hidden');
+                void fx.offsetWidth;
+                fx.style.opacity = '1';
+
+                this.interval = setInterval(() => {
+                    if (document.hidden) return; 
+                    const spark = document.createElement('div');
+                    spark.className = 'absolute bottom-[-10px] rounded-full mix-blend-screen pointer-events-none';
+                    const colors = ['bg-[#ffaa00]', 'bg-[#ff4400]', 'bg-[#9b111e]'];
+                    spark.classList.add(colors[Math.floor(Math.random() * colors.length)]);
+                    
+                    const size = Math.random() * 4 + 2; 
+                    spark.style.width = size + 'px';
+                    spark.style.height = (size * 1.5) + 'px';
+                    spark.style.filter = `blur(${Math.random()}px)`;
+                    spark.style.boxShadow = `0 0 ${size * 2}px ${spark.className.includes('ffaa00') ? '#ffaa00' : '#ff4400'}`;
+                    
+                    const startX = Math.random() * window.innerWidth;
+                    spark.style.left = startX + 'px';
+                    
+                    sparks.appendChild(spark);
+                    
+                    const duration = Math.random() * 3000 + 2000; 
+                    const endX = startX + (Math.random() - 0.5) * 300; 
+                    const endY = - (Math.random() * window.innerHeight * 0.8 + 200);
+                    
+                    const animation = spark.animate([
+                        { transform: 'translate3d(0, 0, 0) scale(1)', opacity: Math.random() * 0.5 + 0.5 },
+                        { transform: `translate3d(${endX - startX}px, ${endY}px, 0) scale(0.2)`, opacity: 0 }
+                    ], {
+                        duration: duration,
+                        easing: 'cubic-bezier(0.25, 1, 0.5, 1)', 
+                        fill: 'forwards'
+                    });
+                    
+                    animation.onfinish = () => spark.remove();
+                }, 150); 
+            },
+            stop: function() {
+                const fx = document.getElementById('eclipse-fx');
+                if(!fx) return;
+                fx.style.opacity = '0';
+                clearInterval(this.interval);
+                setTimeout(() => {
+                    fx.classList.add('hidden');
+                    const sparks = document.getElementById('sparks-container');
+                    if(sparks) sparks.innerHTML = '';
+                }, 1000);
+            }
+        };
+
         const EMAILJS_PUBLIC_KEY = "mdn_-MJTIEla5ZNLS";
         const EMAILJS_SERVICE_ID = "service_qrkdi0q";
         const EMAILJS_TEMPLATE_ID = "template_k32a7va";
@@ -851,7 +923,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 year: "DROP '26", tag: "CÁPSULA ESPECIAL",
                 image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=2670&auto=format&fit=crop", 
                 pageImage: "https://i.postimg.cc/bNJsDKdt/digital_art_eclipse_clouds_berserk_wallpaper_preview_Copia.jpg", 
-                // NOVO: Link do Vimeo configurado como "background=1" para sumir interface
                 pageVideo: "https://player.vimeo.com/video/1169350461?background=1&autoplay=1&loop=1&muted=1",
                 extraImages: [
                     "https://i.postimg.cc/yYdkgwWc/1405de4e5c788d83fe2eff9e4a7ef3a3_be80a14f7660996cb117017327600989_1024_1024.webp",
@@ -909,10 +980,9 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
 
         let lastTypingTime = 0; 
         
-        // --- FULL SOUND MANAGER COM SUPORTE A BANDA SONORA ---
         const SoundManager = {
             ctx: null, masterGain: null, ambientNodes: [],
-            themeAudioObj: null, // NOVO: Objeto de Áudio HTML5 Nativo
+            themeAudioObj: null, 
             
             init: function() {
                 if (!this.ctx) {
@@ -925,17 +995,15 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 if (this.ctx.state === 'suspended') this.ctx.resume();
             },
 
-            // Função para Tocar Música Tema (HTML5 Audio contorna bloqueios de CORS)
             playThemeMusic: function(url) {
                 this.stopThemeMusic(); 
                 
                 try {
                     this.themeAudioObj = new Audio(url);
                     this.themeAudioObj.loop = true;
-                    this.themeAudioObj.volume = 0; // Começa no zero para o Fade In
+                    this.themeAudioObj.volume = 0; 
                     
                     this.themeAudioObj.play().then(() => {
-                        // Fade in cinematográfico suave
                         let vol = 0;
                         const fadeInterval = setInterval(() => {
                             vol += 0.02;
@@ -954,12 +1022,11 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 }
             },
 
-            // Função para Parar a Música Tema Suavemente (Fade Out)
             stopThemeMusic: function() {
                 if (this.themeAudioObj) {
                     let vol = this.themeAudioObj.volume;
-                    const audioToStop = this.themeAudioObj; // Guarda a referência localmente
-                    this.themeAudioObj = null; // Liberta a global imediatamente
+                    const audioToStop = this.themeAudioObj; 
+                    this.themeAudioObj = null; 
                     
                     const fadeInterval = setInterval(() => {
                         vol -= 0.05;
@@ -1207,7 +1274,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             const posArray = new Float32Array(particlesCount * 3);
             const originalPosArray = new Float32Array(particlesCount * 3);
             
-            // OTIMIZADO: Arrays Globais para o Engine de Temas poder manipulá-los no futuro
             randomArrayGlobal = new Float32Array(particlesCount);
             const colorArray = new Float32Array(particlesCount * 3);
             
@@ -1232,7 +1298,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
 
             geometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
             geometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
-            particlesGeometryGlobal = geometry; // Guarda referência global
+            particlesGeometryGlobal = geometry; 
 
             const material = new THREE.PointsMaterial({
                 size: 0.9, vertexColors: true, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending
@@ -1345,7 +1411,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                         isHovering = true;
                         trail.style.width = "60px";
                         trail.style.height = "60px";
-                        trail.style.backgroundColor = "rgba(212, 175, 55, 0.15)"; /* Modificar background do cursor para o Hover */
+                        trail.style.backgroundColor = "rgba(212, 175, 55, 0.15)"; 
                         trail.style.borderColor = "transparent";
                         SoundManager.playHover();
                     } else {
@@ -1439,12 +1505,13 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 }
                 SoundManager.playClick();
 
-                // GATILHO DE TEMA E MÚSICA
                 if (proj.themeTrigger) {
                     applyTheme(proj.themeTrigger);
-                    // NOVO: Toca a música específica do projeto, se existir
                     if (proj.themeMusic) {
                         SoundManager.playThemeMusic(proj.themeMusic);
+                    }
+                    if (proj.themeTrigger === 'berserk') {
+                        EclipseFX.start();
                     }
                 }
                 
@@ -1457,30 +1524,26 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 document.getElementById('page-tag').innerText = proj.tag;
                 document.getElementById('page-tag').dataset.value = proj.tag;
                 
-                // LÓGICA DE CAPA (VÍDEO NATIVO VS IFRAME VIMEO VS IMAGEM)
                 const pageImage = document.getElementById('page-image');
                 const pageVideo = document.getElementById('page-video');
                 const pageIframe = document.getElementById('page-iframe');
                 
                 if (proj.pageVideo) {
                     if (proj.pageVideo.includes('vimeo.com') || proj.pageVideo.includes('youtube.com')) {
-                        // É um Iframe (Ex: Vimeo)
                         pageIframe.src = proj.pageVideo;
                         pageIframe.classList.remove('hidden');
                         pageVideo.classList.add('hidden');
                         pageImage.classList.add('hidden');
                         pageVideo.pause();
                     } else {
-                        // É um Vídeo Nativo MP4
                         pageVideo.src = proj.pageVideo;
                         pageVideo.classList.remove('hidden');
                         pageIframe.classList.add('hidden');
                         pageImage.classList.add('hidden');
                         pageIframe.src = "";
-                        pageVideo.play().catch(e => console.warn("Autoplay bloqueado pelo navegador:", e));
+                        pageVideo.play().catch(e => console.warn("Autoplay bloqueado:", e));
                     }
                 } else {
-                    // É uma Imagem
                     pageVideo.classList.add('hidden');
                     pageIframe.classList.add('hidden');
                     pageVideo.pause();
@@ -1495,7 +1558,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 if(proj.extraImages) {
                     proj.extraImages.forEach(imgUrl => {
                         gallery.innerHTML += `
-                            <div class="w-full h-64 md:h-[450px] overflow-hidden border border-white/10 group">
+                            <div class="w-full h-64 md:h-[450px] overflow-hidden border border-white/10 group relative z-10">
                                 <img src="${imgUrl}" class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" alt="Detalhe da coleção">
                             </div>
                         `;
@@ -1962,11 +2025,11 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 page.style.pointerEvents = 'none';
                 page.setAttribute('aria-hidden', 'true');
                 
-                // RETORNO AO TEMA PADRÃO E PARAR MÚSICA AO FECHAR PROJETO TEMÁTICO
                 applyTheme('default');
                 SoundManager.stopThemeMusic();
+                EclipseFX.stop(); 
                 if(pageVideo) pageVideo.pause();
-                if(pageIframe) pageIframe.src = ""; // Limpa o iframe para parar o vídeo
+                if(pageIframe) pageIframe.src = ""; 
 
                 setTimeout(() => {
                     page.style.display = 'none';
@@ -2065,11 +2128,11 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                             
                             setTimeout(() => {
                                 if(flash) { flash.style.transition = "opacity 1.0s ease-in-out"; flash.style.opacity = 0; }
-                                // RETORNA O TEMA PADRÃO, PARA MÚSICA E VÍDEO AO FINALIZAR PEDIDO
                                 applyTheme('default');
                                 SoundManager.stopThemeMusic();
+                                EclipseFX.stop();
                                 if(pageVideo) pageVideo.pause();
-                                if(pageIframe) pageIframe.src = ""; // Limpa o iframe
+                                if(pageIframe) pageIframe.src = ""; 
                             }, 100);
 
                             setTimeout(() => {
