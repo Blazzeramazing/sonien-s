@@ -14,8 +14,11 @@
     
     <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
-    <!-- Fonts OTIMIZADAS: Apenas Marcellus (Títulos), Space Mono (Técnico), Inter (Textos Longos) e Syncopate (Botões) -->
+    <!-- Fonts OTIMIZADAS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Marcellus&family=Space+Mono:wght@400&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
@@ -27,10 +30,9 @@
         :root {
             --cursor-size: 10px;
             --cursor-trail-size: 40px;
-            /* Paleta Premium SONIEN'S */
-            --primary: #f5eedc; /* Creme/Bege */
-            --accent: #d4af37; /* Dourado/Bronze */
-            --bg-color: #0d0c0b; /* Fundo Chumbo/Preto Quente */
+            --primary: #f5eedc; 
+            --accent: #d4af37; 
+            --bg-color: #0d0c0b; 
             --glass-border: rgba(245, 238, 220, 0.15);
         }
 
@@ -53,7 +55,6 @@
             color: #fff;
         }
 
-        /* ACESSIBILIDADE: Contorno de foco elegante para navegação por teclado */
         :focus-visible {
             outline: 1px solid var(--accent);
             outline-offset: 4px;
@@ -68,7 +69,6 @@
             cursor: none !important;
         }
 
-        /* Magnetic Utility */
         .magnetic-btn {
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             will-change: transform;
@@ -132,7 +132,7 @@
             pointer-events: none; z-index: 9000; opacity: 0.03;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
             animation: analogNoise 0.4s steps(1) infinite;
-            will-change: transform, opacity; /* OTIMIZAÇÃO GPU */
+            will-change: transform, opacity; 
         }
         @keyframes analogNoise {
             0%, 100% { transform: translate(0, 0); opacity: 0.03; }
@@ -142,7 +142,6 @@
             80% { transform: translate(2px, -2px); opacity: 0.03; }
         }
 
-        /* Dual Cursor System - OTIMIZADO PARA GPU TRANSLATE3D */
         .cursor-dot, .cursor-trail {
             display: none; position: fixed; top: 0; left: 0;
             border-radius: 50%; z-index: 10005; pointer-events: none;
@@ -153,7 +152,7 @@
         .cursor-dot {
             width: var(--cursor-size); height: var(--cursor-size);
             background-color: var(--primary); 
-            transition: background-color 0.2s; /* Removidos transitions de left/top para evitar reflow */
+            transition: background-color 0.2s;
         }
 
         .cursor-trail {
@@ -210,7 +209,6 @@
         .card-image-container img {
             width: 100%; height: 100%; object-fit: cover;
             transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s;
-            /* SVG LIQUID FILTER APLICADO AQUI */
             filter: grayscale(80%) sepia(20%) brightness(0.8) url(#liquid-filter); 
             -webkit-user-drag: none;
             transform: scale(1.05) translate(var(--px, 0px), var(--py, 0px));
@@ -287,7 +285,6 @@
         .hud-tl { display: none; top: 100px; left: 30px; writing-mode: vertical-rl; transform: rotate(180deg); }
         @media(min-width: 768px) { .hud-tl { display: block; } }
 
-        /* Estilo do Ponto Ativo no HUD */
         .dot-inner.active {
             background-color: var(--accent);
             transform: scale(2);
@@ -328,7 +325,6 @@
             }
         }
 
-        /* Holographic Reveals */
         .holo-container { position: relative; overflow: hidden; opacity: 0; }
         .holo-active { animation: holoFadeIn 0.1s linear forwards; }
         .holo-active .holo-mask { animation: holoScan 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
@@ -361,7 +357,6 @@
         @keyframes aetherFloat { 0%, 100% { transform: translateY(0px) scale(1); } 50% { transform: translateY(-12px) scale(1.03); } }
         .aether-float { animation: aetherFloat 6s ease-in-out infinite; }
 
-        /* Estilo da Logo Inline */
         .brand-logo-text {
             font-family: 'Marcellus', serif;
             letter-spacing: 0.05em;
@@ -371,10 +366,8 @@
 </head>
 <body class="antialiased hidden-overflow no-scroll selection:bg-white selection:text-black">
 
-    <!-- ACESSIBILIDADE: Título invisível para Leitores de Ecrã -->
     <h1 class="sr-only">SONIEN'S Alta Costura - Experiência Interativa 3D</h1>
 
-    <!-- EFEITO ORGÂNICO: Filtro SVG de Distorção "Seda / Água" -->
     <svg style="width:0; height:0; position:absolute;" aria-hidden="true" focusable="false">
         <defs>
             <filter id="liquid-filter">
@@ -384,7 +377,6 @@
         </defs>
     </svg>
 
-    <!-- HUD (Indicador Espacial Z) -->
     <div class="hud-element hud-bl" aria-hidden="true">
         <div id="hud-coords">COLEÇÃO: ESSÊNCIA</div>
         <div>ALFAIATARIA: <span id="network-status" style="color: var(--accent);">PREMIUM</span></div>
@@ -397,12 +389,9 @@
         SONIEN'S // ALTA COSTURA
     </div>
 
-    <!-- HUD NAV / TIMELINE VERTICAL -->
     <nav id="hud-nav" aria-label="Navegação Rápida" class="fixed right-8 top-1/2 -translate-y-1/2 z-50 hidden md:flex flex-col items-center gap-10 opacity-0 transition-opacity duration-1000 pointer-events-none">
-        <!-- Linha Guia -->
         <div class="absolute top-0 bottom-0 w-[1px] bg-white/10 left-1/2 -translate-x-1/2 -z-10"></div>
         
-        <!-- Pontos Interativos (Com suporte para Teclado via tabindex) -->
         <div tabindex="0" role="button" aria-label="Ir para Início" class="hud-dot relative cursor-pointer group hover-trigger p-2" onclick="SoundManager.playClick(); window.scrollToSection(0)" onkeydown="if(event.key==='Enter') this.click()">
             <span class="absolute right-8 top-1/2 -translate-y-1/2 text-[9px] font-mono tracking-widest text-[#d4af37] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase pointer-events-none">Início</span>
             <div class="w-1.5 h-1.5 rounded-full bg-white/30 transition-all duration-500 dot-inner" data-z="0"></div>
@@ -425,7 +414,6 @@
         </div>
     </nav>
 
-    <!-- PRELOADER -->
     <div id="preloader">
         <div class="flex flex-col items-center z-10 px-4 text-center">
             <h1 class="text-4xl md:text-6xl mb-6 brand-logo-text text-white">SONIEN'S</h1>
@@ -441,10 +429,8 @@
         </div>
     </div>
 
-    <!-- FLASH OVERLAY -->
     <div id="flash-overlay"></div>
 
-    <!-- INTRO MODAL -->
     <div id="isekai-modal" role="dialog" aria-modal="true" aria-labelledby="isekai-title">
         <div class="flex justify-between border-b border-white/10 pb-4 mb-6 text-[10px] font-mono tracking-widest text-gray-400 uppercase">
             <span>Manifesto_Marca</span>
@@ -459,26 +445,20 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         </div>
     </div>
 
-    <!-- BACKGROUND (Three.js) -->
     <canvas id="webgl-canvas" aria-hidden="true" class="fixed top-0 left-0 w-full h-full -z-10"></canvas>
     
-    <!-- NOISE -->
     <div class="noise-overlay"></div>
 
-    <!-- DUAL CURSOR -->
     <div class="cursor-dot" aria-hidden="true"></div>
     <div class="cursor-trail" aria-hidden="true"></div>
 
-    <!-- MOBILE MENU -->
     <div id="mobile-menu" aria-hidden="true">
         <a tabindex="0" href="#" class="text-4xl brand-logo-text mb-8 mobile-link solar-text text-white hover-trigger magnetic-btn" data-nav-to="1000" data-value="Coleções">Coleções</a>
         <a tabindex="0" href="#" class="text-4xl brand-logo-text mb-8 mobile-link solar-text text-white hover-trigger magnetic-btn" data-nav-to="2000" data-value="O Atelier">O Atelier</a>
         <a tabindex="0" href="#" class="text-4xl brand-logo-text mb-8 mobile-link solar-text text-white hover-trigger magnetic-btn" data-nav-to="3000" data-value="Contacto">Contacto</a>
     </div>
 
-    <!-- NAVIGATION -->
     <nav class="fixed top-0 w-full p-6 md:p-10 flex justify-between items-center z-50 opacity-0" id="main-nav" aria-label="Navegação Principal">
-        <!-- Substituído AETHER por Logo SONIEN'S formatada -->
         <div tabindex="0" role="button" aria-label="Ir para o Início" class="text-2xl font-bold brand-logo-text hover-trigger z-50 cursor-pointer magnetic-btn flex items-center gap-3" onclick="SoundManager.playClick(); window.scrollToSection(0)" onkeydown="if(event.key==='Enter') this.click()">
             <svg class="w-6 h-6" viewBox="0 0 100 100" aria-hidden="true">
                 <circle cx="50" cy="50" r="48" fill="transparent" stroke="currentColor" stroke-width="2"/>
@@ -499,22 +479,18 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             Agendar Prova
         </button>
 
-        <!-- HAMBURGER BUTTON -->
         <button tabindex="0" id="hamburger-btn" aria-label="Abrir Menu" aria-expanded="false" class="md:hidden z-50 flex flex-col gap-1.5 p-4 -m-4 hover-trigger magnetic-btn">
             <div class="hamburger-line origin-center"></div>
             <div class="hamburger-line origin-center"></div>
         </button>
     </nav>
 
-    <!-- 3D VIEWPORT -->
     <div id="viewport" aria-live="polite">
-        <!-- HERO (Z = 0) -->
         <section class="section-3d" data-z="0" aria-label="Secção Inicial">
             <div class="flex flex-col justify-center items-center px-6 text-center max-w-5xl">
                 <p class="font-mono text-gray-400 mb-6 text-xs tracking-[0.5em] solar-text uppercase" data-value="ALTA COSTURA & DESIGN">ALTA COSTURA & DESIGN</p>
                 
                 <div class="flex flex-col items-center mb-8 relative z-10 w-full">
-                    <!-- Modificado para incluir a animação hero-shine-text sem mix-blend-overlay para ser visível -->
                     <h2 class="brand-logo-text text-[15vw] leading-[0.9] solar-text hero-shine-text" data-value="Sonien's">Sonien's</h2>
                     <p class="font-display italic text-[4vw] tracking-widest text-gray-300 mt-2 solar-text" data-value="A Essência do Estilo">A Essência do Estilo</p>
                 </div>
@@ -538,7 +514,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             </div>
         </section>
 
-        <!-- PROJECTS (Z = 1000) -->
         <section class="section-3d" data-z="1000" id="work" aria-label="Coleções de Assinatura">
             <div class="w-full flex flex-col items-center">
                 <div class="flex flex-col justify-center items-center mb-8 md:mb-12 gap-2 px-6 text-center pt-16 md:pt-0">
@@ -553,7 +528,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             </div>
         </section>
 
-        <!-- SERVICES (Z = 2000) -->
         <section class="section-3d" data-z="2000" id="about" aria-label="O Nosso Atelier">
             <div id="service-img-left" class="holo-container hidden min-[1921px]:block absolute left-[10%] top-1/2 -translate-y-1/2 w-96 h-[32rem] border border-white/5 z-0 [perspective:1000px]" aria-hidden="true">
                 <div class="holo-border-line line-top"></div><div class="holo-border-line line-right"></div>
@@ -617,7 +591,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             </div>
         </section>
 
-        <!-- CONTACT (Z = 3000) -->
         <section class="section-3d" data-z="3000" id="contact" aria-label="Área de Contacto">
             <div class="text-center px-4">
                 <p class="font-mono text-gray-500 mb-8 text-xs tracking-widest solar-text uppercase" data-value="EXPERIMENTE O EXCLUSIVO">EXPERIMENTE O EXCLUSIVO</p>
@@ -632,7 +605,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             </div>
         </section>
 
-        <!-- FOOTER (Z = 4000) -->
         <section class="section-3d" data-z="4000" id="footer-section" aria-label="Rodapé do Site">
             <div class="flex flex-col items-center justify-center text-center gap-12 w-full px-6">
                 <div class="text-6xl brand-logo-text tracking-tighter footer-shine-text" aria-hidden="true">SONIEN'S</div>
@@ -654,11 +626,9 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         </section>
     </div>
 
-    <!-- DEDICATED PAGE (Substitui o antigo Project Modal) -->
     <div id="dedicated-page" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Detalhes da Coleção Selecionada" class="fixed inset-0 z-[10000] bg-[var(--bg-color)] overflow-y-auto hidden opacity-0 transition-opacity duration-700 pointer-events-none">
         <div class="noise-overlay"></div>
         
-        <!-- Header / Back Button -->
         <div class="sticky top-0 w-full p-6 md:p-10 flex justify-between items-center z-50 bg-[#0d0c0b]/90 backdrop-blur-md border-b border-white/5">
             <button tabindex="0" id="btn-back-page" aria-label="Voltar às Coleções" class="text-white hover-trigger magnetic-btn flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest hover:text-[#d4af37] transition-colors">
                 <i data-lucide="arrow-left" class="w-5 h-5" aria-hidden="true"></i> Voltar às Coleções
@@ -666,9 +636,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             <div class="brand-logo-text text-xl tracking-widest text-[#d4af37]" aria-hidden="true">SONIEN'S</div>
         </div>
 
-        <!-- Content -->
         <div class="max-w-7xl mx-auto px-6 py-12 md:py-20 flex flex-col lg:flex-row gap-12 lg:gap-20">
-            <!-- Left: Hero/Info -->
             <div class="flex-1 flex flex-col justify-center">
                 <span id="page-tag" class="text-[10px] font-mono text-[#d4af37] border border-[#d4af37]/30 px-3 py-1 uppercase tracking-widest mb-6 inline-block self-start solar-text" aria-live="polite"></span>
                 <h2 id="page-title" class="text-5xl md:text-7xl font-display italic text-white mb-6 solar-text" aria-live="polite"></h2>
@@ -679,7 +647,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 </div>
             </div>
             
-            <!-- Right: Order Form -->
             <div class="flex-1 bg-white/5 p-8 md:p-12 border border-white/10 relative overflow-hidden flex flex-col justify-center">
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#d4af37] to-transparent opacity-50"></div>
                 
@@ -728,11 +695,9 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             </div>
         </div>
         
-        <!-- Espaçamento no fundo -->
         <div class="h-20 w-full"></div>
     </div>
 
-    <!-- CONTACT FORM MODAL (Mantido para Contato Geral) -->
     <div id="contact-modal" aria-hidden="true" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="contact-title">
         <div class="modal-content max-w-4xl bg-[#0d0c0b] border border-white/10 p-0 flex flex-row overflow-hidden relative"> 
             <button id="close-contact" tabindex="0" aria-label="Fechar Contacto" class="absolute top-6 right-6 text-white hover:rotate-90 transition-transform hover-trigger z-50 magnetic-btn">
@@ -777,14 +742,17 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         let lastScrollTime = 0;
         const scrollCooldown = 1300; 
         
-        // --- SERVICES IMAGES DATA (Tailoring & Fabric details) ---
+        // CONFIGURAÇÕES EMAILJS (Substitua as strings abaixo pelas suas chaves)
+        const EMAILJS_PUBLIC_KEY = "SUA_PUBLIC_KEY_AQUI";
+        const EMAILJS_SERVICE_ID = "SEU_SERVICE_ID_AQUI";
+        const EMAILJS_TEMPLATE_ID = "SEU_TEMPLATE_ID_AQUI";
+        
         const serviceImagesData = [
-            ["https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?q=80&w=1000&auto=format&fit=crop", "https://images.unsplash.com/photo-1528360983277-13d401cdc186?q=80&w=1000&auto=format&fit=crop"], // 01: Materiais Premium (Texturas de seda e tecidos luxuosos)
-            ["https://images.unsplash.com/photo-1558692518-fc0c9ce112d8?q=80&w=1000&auto=format&fit=crop", "https://images.unsplash.com/photo-1534440026214-38b46e3eaec9?q=80&w=1000&auto=format&fit=crop"], // 02: Design Autoral (Esboços, pranchetas e processo criativo manual)
-            ["https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=1000&auto=format&fit=crop", "https://images.unsplash.com/photo-1594938328870-982424b41300?q=80&w=1000&auto=format&fit=crop"]  // 03: Corte Preciso (Alfaiate a medir tecido, corte exato e manequim)
+            ["https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?q=80&w=1000&auto=format&fit=crop", "https://images.unsplash.com/photo-1528360983277-13d401cdc186?q=80&w=1000&auto=format&fit=crop"], 
+            ["https://images.unsplash.com/photo-1558692518-fc0c9ce112d8?q=80&w=1000&auto=format&fit=crop", "https://images.unsplash.com/photo-1534440026214-38b46e3eaec9?q=80&w=1000&auto=format&fit=crop"], 
+            ["https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=1000&auto=format&fit=crop", "https://images.unsplash.com/photo-1594938328870-982424b41300?q=80&w=1000&auto=format&fit=crop"]  
         ];
 
-        // DATA 
         const projects = [
             {
                 title: "Sétima Arte",
@@ -824,9 +792,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             }
         ];
 
-        // --- FULL SOUND MANAGER ---
-        let lastTypingTime = 0; // OTIMIZAÇÃO: Throttle global para Web Audio API
-
+        let lastTypingTime = 0; 
         const SoundManager = {
             ctx: null, masterGain: null, ambientNodes: [],
             
@@ -881,7 +847,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             playTyping: function() {
                 if (!this.ctx) return;
                 const now = Date.now();
-                // OTIMIZAÇÃO: Impede que o áudio seja tocado milhares de vezes no mesmo frame, causando lag/cortes
                 if (now - lastTypingTime < 40) return; 
                 lastTypingTime = now;
 
@@ -985,13 +950,12 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             }
         };
 
-        // --- LIQUID DISTORTION ANIMATION ---
         let liquidAnimReq;
         function pulseLiquid() {
             const map = document.getElementById('liquid-map');
             if(!map) return;
             let scale = 40; 
-            cancelAnimationFrame(liquidAnimReq); // OTIMIZAÇÃO: usa rAF ao invés de setInterval pesado
+            cancelAnimationFrame(liquidAnimReq); 
             
             function animateLiquid() {
                 scale *= 0.88;
@@ -1005,7 +969,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             animateLiquid();
         }
 
-        // --- SOLAR REVEAL (OTIMIZADO) ---
         const glyphs = "█▓▒░<>/"; 
         function solarReveal(element) {
             const originalText = element.dataset.value || element.innerText;
@@ -1029,11 +992,10 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             });
 
             let startTimestamp;
-            // OTIMIZAÇÃO: requestAnimationFrame no lugar de setInterval poupa a CPU e garante 60fps lisos
             function step(timestamp) {
                 if (!startTimestamp) startTimestamp = timestamp;
                 const progress = timestamp - startTimestamp;
-                const frame = progress / 40; // Equivalente aos 40ms do setInterval anterior
+                const frame = progress / 40; 
                 
                 if (Math.random() > 0.8) SoundManager.playTyping();
                 
@@ -1060,7 +1022,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             requestAnimationFrame(step);
         }
 
-        // --- THREE.JS ---
         function initThreeJS() {
             const canvas = document.getElementById('webgl-canvas');
             const scene = new THREE.Scene();
@@ -1138,7 +1099,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 const winH = window.innerHeight || 1;
                 const forceX = (mouseX / winW) * 70; 
                 const forceY = -(mouseY / winH) * 70;
-                const camZ = camera.position.z; // OTIMIZAÇÃO: Cache da variável de câmara para fora do loop
+                const camZ = camera.position.z; 
 
                 for(let i=0; i<particlesCount; i++) {
                     const i3 = i*3;
@@ -1151,7 +1112,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                         positions[i3+2] += tunnelLength;
                     }
 
-                    // OTIMIZAÇÃO: Removidos checks isNaN desnecessários do loop (eles matavam a CPU)
                     const driftX = Math.sin(time * 0.8 + randomArray[i] * 10) * 4;
                     const driftY = Math.cos(time * 0.6 + randomArray[i] * 10) * 4;
                     const distFactor = 1 + (randomArray[i] * 0.5);
@@ -1194,7 +1154,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             });
         }
 
-        // --- DUAL CURSOR LOGIC (OTIMIZADO) ---
         let cursorX = window.innerWidth / 2, cursorY = window.innerHeight / 2;
         let trailX = cursorX, trailY = cursorY;
         let isHovering = false;
@@ -1204,7 +1163,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             const trail = document.querySelector('.cursor-trail');
             
             if(window.matchMedia("(pointer: fine)").matches) {
-                // Passado para evento passive para não bloquear o frame do navegador
                 document.addEventListener('mousemove', e => {
                     cursorX = e.clientX;
                     cursorY = e.clientY;
@@ -1237,12 +1195,10 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             trailX += (cursorX - trailX) * 0.15;
             trailY += (cursorY - trailY) * 0.15;
             
-            // OTIMIZAÇÃO: Ao invés de mudar `left` e `top` (que causa Reflows destrutivos), usamos translate3d do GPU
             dot.style.transform = `translate3d(calc(${cursorX}px - 50%), calc(${cursorY}px - 50%), 0) scale(${isHovering ? 0 : 1})`;
             trail.style.transform = `translate3d(calc(${trailX}px - 50%), calc(${trailY}px - 50%), 0)`;
         }
 
-        // --- MAGNETIC BUTTONS LOGIC ---
         function initMagneticButtons() {
             const magneticElements = document.querySelectorAll('.magnetic-btn');
             
@@ -1265,7 +1221,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             });
         }
 
-        // --- 3D CAROUSEL ---
         function initCarousel() {
             const stage = document.getElementById('carousel-stage');
             stage.innerHTML = '';
@@ -1449,7 +1404,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
 
     const revealTimeouts = {};
 
-    // --- Z-SCROLL & HTML SECTIONS OTIMIZADOS ---
     function updateHTMLSections() {
             if(!introCompleted) return;
             const sections = document.querySelectorAll('.section-3d');
@@ -1461,7 +1415,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 const dist = z - scrollZ;
                 
                 if(dist > -800 && dist < 1200) {
-                    // OTIMIZAÇÃO: Bloqueia reflows aplicando valores diretos sem instanciar style dezenas de vezes desnecessariamente
                     if(sec.style.visibility !== 'visible') sec.style.visibility = 'visible'; 
                     
                     let opacity = 0, blur = 0, scale = 1;
@@ -1527,7 +1480,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             });
         }
 
-        // --- INPUT HANDLING ---
         function initScroll() {
             window.addEventListener('wheel', e => {
                 if(!introCompleted || isDedicatedPageOpen) return; 
@@ -1679,6 +1631,11 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
 
         // --- INIT SEQUENCE ---
         window.addEventListener('load', () => {
+            // INICIALIZAÇÃO EMAILJS
+            if (typeof emailjs !== 'undefined') {
+                emailjs.init(EMAILJS_PUBLIC_KEY);
+            }
+
             lucide.createIcons();
             initThreeJS();
             initCarousel();
@@ -1687,7 +1644,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             initDualCursor();
             initMagneticButtons();
             
-            // Hamburger
             const btn = document.getElementById('hamburger-btn');
             const menu = document.getElementById('mobile-menu');
             btn.onclick = () => {
@@ -1712,7 +1668,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 };
             });
 
-            // Fake Preload
             let p = 0;
             const bar = document.getElementById('loader-bar');
             const txt = document.getElementById('loader-percent');
@@ -1733,7 +1688,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 }
             }, 30);
             
-            // Enter World
             document.getElementById('enter-world-btn').addEventListener('click', () => {
                 SoundManager.init();
                 SoundManager.playSupernova(); SoundManager.playAmbient();   
@@ -1757,16 +1711,14 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 }, 100);
             });
 
-            // Close Modals & Pages
             document.getElementById('close-contact').onclick = () => document.getElementById('contact-modal').classList.remove('open');
             document.querySelectorAll('.open-contact-btn').forEach(btn => {
                 btn.onclick = () => document.getElementById('contact-modal').classList.add('open');
             });
 
-            // Botão "Voltar" da Página Dedicada
             document.getElementById('btn-back-page').addEventListener('click', () => {
                 SoundManager.playClick();
-                isDedicatedPageOpen = false; // Liberta o scroll principal ao fechar
+                isDedicatedPageOpen = false; 
                 const page = document.getElementById('dedicated-page');
                 page.style.opacity = 0;
                 page.style.pointerEvents = 'none';
@@ -1777,140 +1729,176 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 }, 700);
             });
 
-            // WHATSAPP SUBMIT (Página Dedicada - Estampas) - OTIMIZADO PARA BACKGROUND
+            // WHATSAPP SUBMIT (Página Dedicada - Estampas) - OTIMIZADO PARA EMAILJS
             document.getElementById('dp-submit').addEventListener('click', function() {
                 SoundManager.playClick();
 
                 const collection = document.getElementById('page-title').innerText;
-                const name = document.getElementById('dp-name').value || "Cliente VIP";
+                const name = document.getElementById('dp-name').value;
                 const size = document.getElementById('dp-size').value;
                 const color = document.getElementById('dp-color').value;
                 const msg = document.getElementById('dp-msg').value;
 
-                if (!size || !color || !msg) {
-                    alert("Por favor, selecione Tamanho, Cor e descreva a Ideia da Estampa para prosseguir.");
+                if (!name || !size || !color || !msg) {
+                    alert("Por favor, preencha todos os campos para prosseguir.");
                     return;
                 }
 
-                // UX Imersiva: Feedback visual de processamento no próprio botão
                 this.innerText = "A TRANSMITIR...";
                 this.style.backgroundColor = "#fff";
                 this.style.color = "#000";
 
                 if(SoundManager.playSupernova) SoundManager.playSupernova();
 
-                // Simulação de chamada API em Background (Sem sair da página)
-                setTimeout(() => {
-                    this.innerText = "PEDIDO ENVIADO ✓";
-                    document.getElementById('hud-status').innerText = "TRANSMISSÃO CONCLUÍDA";
-                    document.getElementById('hud-status').style.color = "var(--accent)";
+                // Parâmetros para o Template do EmailJS
+                const templateParams = {
+                    collection: collection,
+                    from_name: name,
+                    size: size,
+                    color: color,
+                    message: msg
+                };
 
-                    setTimeout(() => {
-                        isDedicatedPageOpen = false; // Liberta o scroll após submissão
-
-                        // Flash Effect
-                        const flash = document.getElementById('flash-overlay');
-                        if (flash) {
-                            flash.style.display = 'block'; void flash.offsetWidth;
-                            flash.style.transition = 'opacity 0.05s ease-out'; flash.style.opacity = 1;
-                        }
-
-                        const page = document.getElementById('dedicated-page');
-                        page.style.opacity = 0;
-                        
-                        setTimeout(() => {
-                            if(flash) { flash.style.transition = "opacity 1.0s ease-in-out"; flash.style.opacity = 0; }
-                        }, 100);
+                // Chamada Real à API do EmailJS
+                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+                    .then(() => {
+                        this.innerText = "PEDIDO ENVIADO ✓";
+                        document.getElementById('hud-status').innerText = "TRANSMISSÃO CONCLUÍDA";
+                        document.getElementById('hud-status').style.color = "var(--accent)";
 
                         setTimeout(() => {
-                            page.style.display = 'none';
-                            page.classList.add('hidden');
-                            page.setAttribute('aria-hidden', 'true');
-                            if(flash) flash.style.display = 'none';
+                            isDedicatedPageOpen = false;
 
-                            // Restaurar os estados para a próxima vez
+                            const flash = document.getElementById('flash-overlay');
+                            if (flash) {
+                                flash.style.display = 'block'; void flash.offsetWidth;
+                                flash.style.transition = 'opacity 0.05s ease-out'; flash.style.opacity = 1;
+                            }
+
+                            const page = document.getElementById('dedicated-page');
+                            page.style.opacity = 0;
+                            
+                            setTimeout(() => {
+                                if(flash) { flash.style.transition = "opacity 1.0s ease-in-out"; flash.style.opacity = 0; }
+                            }, 100);
+
+                            setTimeout(() => {
+                                page.style.display = 'none';
+                                page.classList.add('hidden');
+                                page.setAttribute('aria-hidden', 'true');
+                                if(flash) flash.style.display = 'none';
+
+                                this.innerText = "Solicitar Criação";
+                                this.style.backgroundColor = "";
+                                this.style.color = "";
+                                document.getElementById('hud-status').innerText = "INATIVO";
+                                document.getElementById('hud-status').style.color = "";
+
+                            }, 1500); 
+                        }, 1200);
+                    })
+                    .catch((error) => {
+                        console.error('Falha no envio:', error);
+                        this.innerText = "ERRO NA TRANSMISSÃO";
+                        setTimeout(() => {
                             this.innerText = "Solicitar Criação";
                             this.style.backgroundColor = "";
                             this.style.color = "";
-                            document.getElementById('hud-status').innerText = "INATIVO";
-                            document.getElementById('hud-status').style.color = "";
-
-                        }, 1500); 
-                    }, 1200); // Tempo de leitura da confirmação
-                }, 1500); // Tempo de simulação de rede
+                        }, 3000);
+                    });
             });
 
-            // WHATSAPP SUBMIT (Formulário Geral / Contato) - OTIMIZADO PARA BACKGROUND
+            // WHATSAPP SUBMIT (Formulário Geral / Contato) - OTIMIZADO PARA EMAILJS
             document.getElementById('submit-whatsapp').addEventListener('click', function() {
                 SoundManager.playClick();
 
-                const name = document.getElementById('form-name').value || "Cliente VIP";
-                const email = document.getElementById('form-email').value || "Não informado";
-                const msg = document.getElementById('form-msg').value || "Desejo agendar uma prova no atelier.";
+                const name = document.getElementById('form-name').value;
+                const email = document.getElementById('form-email').value;
+                const msg = document.getElementById('form-msg').value;
 
-                // UX Imersiva: Feedback visual de processamento no próprio botão
+                if (!name || !email || !msg) {
+                    alert("Por favor, preencha todos os campos.");
+                    return;
+                }
+
                 this.innerText = "A TRANSMITIR...";
                 this.style.backgroundColor = "#fff";
                 this.style.color = "#000";
 
                 if(SoundManager.playSupernova) SoundManager.playSupernova();
 
-                // Simulação de chamada API em Background (Sem sair da página)
-                setTimeout(() => {
-                    this.innerText = "AGENDAMENTO SOLICITADO ✓";
-                    document.getElementById('hud-status').innerText = "TRANSMISSÃO CONCLUÍDA";
-                    document.getElementById('hud-status').style.color = "var(--accent)";
+                // Parâmetros para o Template do EmailJS
+                const templateParams = {
+                    from_name: name,
+                    reply_to: email,
+                    message: msg
+                };
 
-                    setTimeout(() => {
-                        const flash = document.getElementById('flash-overlay');
-                        if (flash) {
-                            flash.style.display = 'block'; void flash.offsetWidth;
-                            flash.style.transition = 'opacity 0.05s ease-out'; flash.style.opacity = 1;
-                        }
-
-                        document.getElementById('contact-modal').classList.remove('open');
-                        
-                        const viewport = document.getElementById('viewport'); if(viewport) viewport.style.opacity = '0';
-                        const nav = document.getElementById('main-nav'); if(nav) nav.style.opacity = '0';
-                        const footer = document.getElementById('footer-section'); if(footer) footer.style.opacity = '0';
-                        const hudNav = document.getElementById('hud-nav'); if(hudNav) hudNav.style.opacity = '0';
+                // Chamada Real à API do EmailJS
+                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+                    .then(() => {
+                        this.innerText = "AGENDAMENTO SOLICITADO ✓";
+                        document.getElementById('hud-status').innerText = "TRANSMISSÃO CONCLUÍDA";
+                        document.getElementById('hud-status').style.color = "var(--accent)";
 
                         setTimeout(() => {
-                            if(flash) { flash.style.transition = "opacity 1.0s ease-in-out"; flash.style.opacity = 0; }
-                        }, 100);
+                            const flash = document.getElementById('flash-overlay');
+                            if (flash) {
+                                flash.style.display = 'block'; void flash.offsetWidth;
+                                flash.style.transition = 'opacity 0.05s ease-out'; flash.style.opacity = 1;
+                            }
 
+                            document.getElementById('contact-modal').classList.remove('open');
+                            
+                            const viewport = document.getElementById('viewport'); if(viewport) viewport.style.opacity = '0';
+                            const nav = document.getElementById('main-nav'); if(nav) nav.style.opacity = '0';
+                            const footer = document.getElementById('footer-section'); if(footer) footer.style.opacity = '0';
+                            const hudNav = document.getElementById('hud-nav'); if(hudNav) hudNav.style.opacity = '0';
+
+                            setTimeout(() => {
+                                if(flash) { flash.style.transition = "opacity 1.0s ease-in-out"; flash.style.opacity = 0; }
+                            }, 100);
+
+                            setTimeout(() => {
+                                window.scrollToSection(0);
+                                if(viewport) viewport.style.opacity = '1';
+                                if(nav) nav.style.opacity = '1';
+                                if(footer) footer.style.opacity = '1';
+                                if(hudNav) {
+                                    hudNav.style.opacity = '1';
+                                    hudNav.classList.remove('opacity-0', 'pointer-events-none');
+                                }
+                                if(flash) flash.style.display = 'none';
+
+                                const navLinks = document.getElementById('nav-links');
+                                const navCta = document.getElementById('nav-cta');
+                                if(navLinks) {
+                                    navLinks.classList.remove('opacity-0', 'pointer-events-none');
+                                    navLinks.querySelectorAll('.solar-text').forEach(solarReveal);
+                                }
+                                if(navCta) {
+                                    navCta.classList.remove('opacity-0', 'pointer-events-none');
+                                    solarReveal(navCta);
+                                }
+
+                                this.innerText = "Solicitar Agendamento";
+                                this.style.backgroundColor = "";
+                                this.style.color = "";
+                                document.getElementById('hud-status').innerText = "INATIVO";
+                                document.getElementById('hud-status').style.color = "";
+
+                            }, 1500); 
+                        }, 1200);
+                    })
+                    .catch((error) => {
+                        console.error('Falha no envio:', error);
+                        this.innerText = "ERRO NA TRANSMISSÃO";
                         setTimeout(() => {
-                            window.scrollToSection(0);
-                            if(viewport) viewport.style.opacity = '1';
-                            if(nav) nav.style.opacity = '1';
-                            if(footer) footer.style.opacity = '1';
-                            if(hudNav) {
-                                hudNav.style.opacity = '1';
-                                hudNav.classList.remove('opacity-0', 'pointer-events-none');
-                            }
-                            if(flash) flash.style.display = 'none';
-
-                            const navLinks = document.getElementById('nav-links');
-                            const navCta = document.getElementById('nav-cta');
-                            if(navLinks) {
-                                navLinks.classList.remove('opacity-0', 'pointer-events-none');
-                                navLinks.querySelectorAll('.solar-text').forEach(solarReveal);
-                            }
-                            if(navCta) {
-                                navCta.classList.remove('opacity-0', 'pointer-events-none');
-                                solarReveal(navCta);
-                            }
-
-                            // Restaurar os estados para a próxima vez
                             this.innerText = "Solicitar Agendamento";
                             this.style.backgroundColor = "";
                             this.style.color = "";
-                            document.getElementById('hud-status').innerText = "INATIVO";
-                            document.getElementById('hud-status').style.color = "";
-
-                        }, 1500); 
-                    }, 1200); // Tempo de leitura da confirmação
-                }, 1500); // Tempo de simulação de rede
+                        }, 3000);
+                    });
             });
         });
     </script>
