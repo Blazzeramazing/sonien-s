@@ -663,7 +663,8 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         
         <!-- NOVO: Eclipse Background (Luar fica na camada z-0, atrás das imagens/vídeos) -->
         <div id="eclipse-bg" class="fixed inset-0 pointer-events-none z-0 hidden opacity-0 transition-opacity duration-1000">
-            <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#9b111e]/50 via-[#9b111e]/10 to-transparent mix-blend-screen"></div>
+            <!-- OTIMIZADO: Removido o mix-blend-screen pesado. Usamos apenas transparência pura (/60 e /20) -->
+            <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#9b111e]/60 via-[#9b111e]/20 to-transparent"></div>
         </div>
         
         <div class="sticky top-0 w-full p-6 md:p-10 flex justify-between items-center z-50 bg-[#0d0c0b]/90 backdrop-blur-md border-b border-white/5">
@@ -680,11 +681,9 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 <h2 id="page-title" class="text-5xl md:text-8xl font-display italic text-[var(--primary)] mb-8 solar-text transition-colors duration-1000" aria-live="polite"></h2>
             </div>
             
-            <div class="w-full h-[50vh] md:h-[70vh] overflow-hidden border border-white/10 relative group bg-[#0d0c0b]">
-                <!-- A imagem mantém os efeitos visuais, pois é estática e não pesa -->
+            <!-- OTIMIZADO: Adicionado translateZ(0) forçar aceleração de hardware sem pesar os filtros -->
+            <div class="w-full h-[50vh] md:h-[70vh] overflow-hidden border border-white/10 relative group bg-[#0d0c0b]" style="transform: translateZ(0);">
                 <img id="page-image" src="" class="absolute inset-0 w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" alt="Fotografia de arte da coleção">
-                
-                <!-- OTIMIZADO: Removidos grayscale e transforms do vídeo e iframe para garantir 60fps constantes -->
                 <video id="page-video" src="" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover hidden pointer-events-none"></video>
                 <iframe id="page-iframe" src="" frameborder="0" allow="autoplay; fullscreen" class="absolute inset-0 w-full h-full scale-[1.15] hidden pointer-events-none"></iframe>
             </div>
@@ -755,8 +754,8 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         
         <!-- ECLIPSE FX OVERLAY (Fumaça e Faíscas ficam na camada z-[10005], por cima do vídeo) -->
         <div id="eclipse-fg" class="fixed inset-0 pointer-events-none z-[10005] hidden opacity-0 transition-opacity duration-1000">
-            <!-- Fumaça -->
-            <div class="absolute inset-0 opacity-20 mix-blend-screen animate-smoke pointer-events-none"></div>
+            <!-- Fumaça OTIMIZADA sem mix-blend-screen -->
+            <div class="absolute inset-0 opacity-20 animate-smoke pointer-events-none"></div>
             <!-- Container de Faíscas -->
             <div id="sparks-container" class="absolute inset-0 overflow-hidden pointer-events-none"></div>
         </div>
@@ -1339,6 +1338,15 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             const clock = new THREE.Clock();
 
             function animate() {
+                // CORREÇÃO: Atualiza o cursor sempre, independentemente de o fundo 3D estar pausado!
+                updateDualCursor();
+
+                // OTIMIZAÇÃO EXTREMA: Se a página dedicada (vídeo) estiver aberta, congela o motor 3D!
+                if (isDedicatedPageOpen) {
+                    requestAnimationFrame(animate);
+                    return; // Aborta todos os cálculos matemáticos e de renderização 3D
+                }
+
                 const time = clock.getElapsedTime();
                 const positions = geometry.attributes.position.array;
                 
@@ -1396,7 +1404,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
 
                 updateHTMLSections();
                 updateCarousel3D();
-                updateDualCursor();
+                // (O updateDualCursor que estava aqui foi movido para o topo)
 
                 document.getElementById('hud-coords').innerText = `COLEÇÃO: ESSÊNCIA | PROFUNDIDADE: ${Math.floor(scrollZ)} PX`;
                 
