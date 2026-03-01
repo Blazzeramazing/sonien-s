@@ -692,11 +692,23 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 <h2 id="page-title" class="text-5xl md:text-8xl font-display italic text-[var(--primary)] mb-8 solar-text transition-colors duration-1000" aria-live="polite"></h2>
             </div>
             
-            <!-- OTIMIZADO: Adicionado translateZ(0) forçar aceleração de hardware sem pesar os filtros -->
+            <!-- OTIMIZADO: Contentor mantido com overflow-hidden para cortar os excessos -->
             <div class="w-full h-[50vh] md:h-[70vh] overflow-hidden border border-white/10 relative group bg-[#0d0c0b]" style="transform: translateZ(0);">
+                
                 <img id="page-image" src="" class="absolute inset-0 w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" alt="Fotografia de arte da coleção">
+                
                 <video id="page-video" src="" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover hidden pointer-events-none"></video>
-                <iframe id="page-iframe" src="" frameborder="0" allow="autoplay; fullscreen" class="absolute inset-0 w-full h-full scale-[1.15] hidden pointer-events-none"></iframe>
+                
+                <!-- 
+                     A MAGIA ACONTECE AQUI: 
+                     1. left-1/2 top-1/2 e -translate centram o vídeo exatamente no meio.
+                     2. O style usa matemática (max) para garantir que o iframe seja sempre 16:9 (177.77vh e 56.25vw) e maior que a tela.
+                -->
+                <iframe id="page-iframe" src="" frameborder="0" allow="autoplay; fullscreen" 
+                        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden pointer-events-none transition-opacity duration-1000" 
+                        style="width: max(100vw, 177.77vh); height: max(56.25vw, 100vh); max-width: none;">
+                </iframe>
+                
             </div>
 
             <div class="flex flex-col items-center">
