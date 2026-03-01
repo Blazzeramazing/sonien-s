@@ -1514,8 +1514,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         function initCarousel() {
             const stage = document.getElementById('carousel-stage');
             stage.innerHTML = '';
-            // OTIMIZADO: Raio de rotação reduzido no mobile para combinar com os cartões mais pequenos
-            const radius = window.innerWidth < 768 ? 160 : 380;
+            const radius = window.innerWidth < 768 ? 200 : 380;
             const angleStep = 360 / projects.length;
 
             projects.forEach((proj, i) => {
@@ -1526,21 +1525,25 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 el.setAttribute('aria-label', 'Ver detalhes da coleção ' + proj.title);
                 el.style.transform = `rotateY(${i * angleStep}deg) translateZ(${radius}px)`;
                 
-                // OTIMIZADO: Descrição removida para poupar espaço. Apenas Imagem, Título, Ano e Tag.
                 el.innerHTML = `
                     <div class="card-image-container">
                         <img src="${proj.image}" alt="${proj.title}">
                     </div>
-                    <div class="flex flex-col flex-1 w-full justify-center">
-                        <div class="flex justify-between items-center w-full">
-                            <div class="flex-1 min-w-0 pr-2">
-                                <span class="text-[8px] md:text-[9px] font-mono text-[var(--accent)] tracking-wider block mb-1 truncate transition-colors duration-1000">${proj.tag}</span>
-                                <h3 class="text-lg md:text-2xl font-display italic text-white truncate solar-text card-solar-text transition-colors duration-1000" data-value="${proj.title}">${proj.title}</h3>
+                    <div class="flex flex-col flex-1 w-full min-w-0">
+                        <div class="flex justify-between items-end mt-4 mb-3 w-full">
+                            <div class="flex-1 min-w-0 pr-4">
+                                <span class="text-[9px] font-mono text-[var(--accent)] tracking-wider block mb-1 truncate transition-colors duration-1000">${proj.tag}</span>
+                                <h3 class="text-2xl font-display italic text-white truncate solar-text card-solar-text transition-colors duration-1000" data-value="${proj.title}">${proj.title}</h3>
                             </div>
-                            <span class="text-[8px] md:text-[9px] font-mono text-gray-500 flex-shrink-0">${proj.year}</span>
+                            <span class="text-[9px] font-mono text-gray-500 flex-shrink-0">${proj.year}</span>
                         </div>
+                        <div class="w-full relative flex-1 min-h-0">
+                        <p class="text-[11px] text-gray-400 font-light leading-relaxed break-words whitespace-normal line-clamp-4 solar-text card-solar-text" data-value="${proj.desc.split('\n')[0]}">
+                            ${proj.desc.split('\n')[0]}
+                        </p>
                     </div>
-                `;
+                </div>
+            `;
             
             el.addEventListener('mouseenter', () => {
                 if(introCompleted && !isDraggingCarousel) pulseLiquid();
