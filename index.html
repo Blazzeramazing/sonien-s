@@ -658,6 +658,11 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
     <div id="dedicated-page" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Detalhes da Coleção Selecionada" class="fixed inset-0 bg-[var(--bg-color)] overflow-y-auto hidden opacity-0 transition-opacity duration-700 pointer-events-none" style="z-index: 10000;">
         <div class="noise-overlay"></div>
         
+        <!-- NOVO: Eclipse Background (Luar fica na camada z-0, atrás das imagens/vídeos) -->
+        <div id="eclipse-bg" class="fixed inset-0 pointer-events-none z-0 hidden opacity-0 transition-opacity duration-1000">
+            <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#9b111e]/50 via-[#9b111e]/10 to-transparent mix-blend-screen"></div>
+        </div>
+        
         <div class="sticky top-0 w-full p-6 md:p-10 flex justify-between items-center z-50 bg-[#0d0c0b]/90 backdrop-blur-md border-b border-white/5">
             <button tabindex="0" id="btn-back-page" aria-label="Voltar às Coleções" class="text-[var(--primary)] hover-trigger magnetic-btn flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest hover:text-[var(--accent)] transition-colors">
                 <i data-lucide="arrow-left" class="w-5 h-5" aria-hidden="true"></i> Voltar às Coleções
@@ -745,17 +750,15 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             </div>
         </div>
         
-        <!-- ECLIPSE FX OVERLAY -->
-        <div id="eclipse-fx" class="fixed inset-0 pointer-events-none z-[10005] hidden opacity-0 transition-opacity duration-1000">
-            <!-- Luar Avermelhado CORRIGIDO para h-full sem cortes -->
-            <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#9b111e]/50 via-[#9b111e]/10 to-transparent mix-blend-screen"></div>
+        <!-- ECLIPSE FX OVERLAY (Fumaça e Faíscas ficam na camada z-[10005], por cima do vídeo) -->
+        <div id="eclipse-fg" class="fixed inset-0 pointer-events-none z-[10005] hidden opacity-0 transition-opacity duration-1000">
             <!-- Fumaça -->
             <div class="absolute inset-0 opacity-20 mix-blend-screen animate-smoke pointer-events-none"></div>
             <!-- Container de Faíscas -->
             <div id="sparks-container" class="absolute inset-0 overflow-hidden pointer-events-none"></div>
         </div>
 
-        <div class="h-20 w-full"></div>
+        <div class="h-20 w-full relative z-10"></div>
     </div>
 
     <div id="contact-modal" aria-hidden="true" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="contact-title">
@@ -842,16 +845,21 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             }
         }
         
-        // EFEITOS ESPECIAIS (FAÍSCAS)
+        // EFEITOS ESPECIAIS (FAÍSCAS E LUAR SEPARADOS)
         const EclipseFX = {
             interval: null,
             start: function() {
-                const fx = document.getElementById('eclipse-fx');
+                const bg = document.getElementById('eclipse-bg');
+                const fg = document.getElementById('eclipse-fg');
                 const sparks = document.getElementById('sparks-container');
-                if(!fx || !sparks) return;
-                fx.classList.remove('hidden');
-                void fx.offsetWidth;
-                fx.style.opacity = '1';
+                if(!bg || !fg || !sparks) return;
+                
+                bg.classList.remove('hidden');
+                fg.classList.remove('hidden');
+                void bg.offsetWidth;
+                void fg.offsetWidth;
+                bg.style.opacity = '1';
+                fg.style.opacity = '1';
 
                 this.interval = setInterval(() => {
                     if (document.hidden) return; 
@@ -888,12 +896,17 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 }, 150); 
             },
             stop: function() {
-                const fx = document.getElementById('eclipse-fx');
-                if(!fx) return;
-                fx.style.opacity = '0';
+                const bg = document.getElementById('eclipse-bg');
+                const fg = document.getElementById('eclipse-fg');
+                if(!bg || !fg) return;
+                
+                bg.style.opacity = '0';
+                fg.style.opacity = '0';
                 clearInterval(this.interval);
+                
                 setTimeout(() => {
-                    fx.classList.add('hidden');
+                    bg.classList.add('hidden');
+                    fg.classList.add('hidden');
                     const sparks = document.getElementById('sparks-container');
                     if(sparks) sparks.innerHTML = '';
                 }, 1000);
