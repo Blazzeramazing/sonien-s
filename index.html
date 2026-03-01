@@ -34,6 +34,9 @@
             --accent: #d4af37; 
             --bg-color: #0d0c0b; 
             --glass-border: rgba(245, 238, 220, 0.15);
+            /* Variáveis dinâmicas para o Mouse Parallax Otimizado na GPU */
+            --mx: 0; 
+            --my: 0;
         }
 
         body {
@@ -211,11 +214,12 @@
             transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s;
             filter: grayscale(80%) sepia(20%) brightness(0.8) url(#liquid-filter); 
             -webkit-user-drag: none;
-            transform: scale(1.05) translate(var(--px, 0px), var(--py, 0px));
+            /* OTIMIZADO: Lógica de Parallax agora responde à raiz da página via CSS. Sem delays de QuerySelector */
+            transform: scale(1.05) translate(calc(var(--mx, 0) * -12px), calc(var(--my, 0) * -12px));
             will-change: transform, filter;
         }
         .project-card-3d:hover .card-image-container img {
-            transform: scale(1.15) translate(calc(var(--px, 0px) * 1.5), calc(var(--py, 0px) * 1.5));
+            transform: scale(1.15) translate(calc(var(--mx, 0) * -18px), calc(var(--my, 0) * -18px));
             filter: grayscale(0%) sepia(10%) brightness(1) url(#liquid-filter);
         }
 
@@ -314,6 +318,9 @@
             -webkit-background-clip: text; background-clip: text;
             animation: textShine 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
             opacity: 0.9;
+            /* OTIMIZADO: Separa a execução desta animação na GPU e estabiliza o Reflow */
+            will-change: transform, background-position;
+            transform: translateZ(0); 
         }
 
         @keyframes textShine { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
@@ -742,7 +749,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         let lastScrollTime = 0;
         const scrollCooldown = 1300; 
         
-        // CONFIGURAÇÕES EMAILJS (Substitua as strings abaixo pelas suas chaves)
+        // CONFIGURAÇÕES EMAILJS
         const EMAILJS_PUBLIC_KEY = "mdn_-MJTIEla5ZNLS";
         const EMAILJS_SERVICE_ID = "service_qrkdi0q";
         const EMAILJS_TEMPLATE_ID = "template_k32a7va";
@@ -1017,6 +1024,9 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
 
                 if (frame <= 50) {
                     requestAnimationFrame(step);
+                } else {
+                    // OTIMIZAÇÃO: Limpeza de DOM! Remove os spans para renderização limpa do CSS e GPU
+                    element.innerHTML = originalText.replace(/\n/g, '<br>');
                 }
             }
             requestAnimationFrame(step);
@@ -1557,28 +1567,26 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 }
             }, { passive: true });
             
+            // OTIMIZADO: Lógica fora do EventListener 
+            const leftImg = document.querySelector('#service-img-left .service-img-inner');
+            const rightImg = document.querySelector('#service-img-right .service-img-inner');
+            const heroTitle = document.querySelector('.hero-shine-text');
+
             document.addEventListener('mousemove', (e) => {
                 if (window.innerWidth < 768) return;
                 const x = (e.clientX / window.innerWidth - 0.5) * 2; 
                 const y = (e.clientY / window.innerHeight - 0.5) * 2; 
                 
-                const leftImg = document.querySelector('#service-img-left .service-img-inner');
-                const rightImg = document.querySelector('#service-img-right .service-img-inner');
-                
+                document.documentElement.style.setProperty('--mx', x);
+                document.documentElement.style.setProperty('--my', y);
+
                 if (leftImg && rightImg) {
                     leftImg.style.transform = `perspective(1000px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg) translateZ(25px)`;
                     rightImg.style.transform = `perspective(1000px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg) translateZ(25px)`;
                 }
 
-                document.querySelectorAll('.card-image-container img').forEach(img => {
-                    img.style.setProperty('--px', `${-x * 12}px`);
-                    img.style.setProperty('--py', `${-y * 12}px`);
-                });
-
-                const heroTitle = document.querySelector('.hero-shine-text');
                 if (heroTitle) {
-                    heroTitle.style.transform = `translate(${x * 15}px, ${y * 15}px)`;
-                    heroTitle.style.transition = 'none'; 
+                    heroTitle.style.transform = `translate3d(${x * 15}px, ${y * 15}px, 0)`;
                 }
             }, { passive: true });
         }
