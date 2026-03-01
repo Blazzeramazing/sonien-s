@@ -15,11 +15,10 @@
     <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
-    <!-- Fonts -->
+    <!-- Fonts OTIMIZADAS: Apenas Marcellus (Títulos), Space Mono (Técnico), Inter (Textos Longos) e Syncopate (Botões) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- SONIEN'S Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400;1,600&family=Marcellus&family=Syncopate:wght@400;700&family=Inter:wght@200;300;400&family=Space+Mono:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&family=Marcellus&family=Space+Mono:wght@400&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
 
     <!-- Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -54,7 +53,14 @@
             color: #fff;
         }
 
-        .font-display { font-family: 'Cormorant Garamond', serif; }
+        /* ACESSIBILIDADE: Contorno de foco elegante para navegação por teclado */
+        :focus-visible {
+            outline: 1px solid var(--accent);
+            outline-offset: 4px;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .font-display { font-family: 'Marcellus', serif; }
         .font-tech { font-family: 'Syncopate', sans-serif; }
         .font-mono { font-family: 'Space Mono', monospace; }
 
@@ -82,10 +88,9 @@
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
             opacity: 0; pointer-events: none; 
-            visibility: hidden; /* OTIMIZAÇÃO: Evita Reflows caros em vez de display: none */
+            visibility: hidden; 
             transform-style: preserve-3d;
             will-change: transform, opacity;
-            /* OTIMIZAÇÃO: Removida a transição CSS que conflituava com as atualizações JS a 60fps */
         }
 
         section.active-section {
@@ -95,7 +100,7 @@
 
         #work, #about, #contact, #footer-section { padding-top: 0; }
 
-        nav, .hud-element, .hud-line {
+        nav, .hud-element, #hud-nav {
             position: fixed; z-index: 50;
             transition: opacity 1s ease;
         }
@@ -123,28 +128,32 @@
         #hamburger-btn.open .hamburger-line:last-child { transform: rotate(-45deg) translate(5px, -5px); }
 
         .noise-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 9000; opacity: 0.04;
+            position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+            pointer-events: none; z-index: 9000; opacity: 0.03;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-            animation: noise 0.2s infinite;
+            animation: analogNoise 0.4s steps(1) infinite;
+            will-change: transform, opacity; /* OTIMIZAÇÃO GPU */
         }
-        @keyframes noise {
-            0% { transform: translate(0,0); }
-            100% { transform: translate(5px,5px); }
+        @keyframes analogNoise {
+            0%, 100% { transform: translate(0, 0); opacity: 0.03; }
+            20% { transform: translate(-2px, 2px); opacity: 0.05; }
+            40% { transform: translate(-2px, -2px); opacity: 0.04; }
+            60% { transform: translate(2px, 2px); opacity: 0.06; }
+            80% { transform: translate(2px, -2px); opacity: 0.03; }
         }
 
-        /* Dual Cursor System */
+        /* Dual Cursor System - OTIMIZADO PARA GPU TRANSLATE3D */
         .cursor-dot, .cursor-trail {
             display: none; position: fixed; top: 0; left: 0;
             border-radius: 50%; z-index: 10005; pointer-events: none;
             mix-blend-mode: difference;
-            transform: translate(-50%, -50%);
+            will-change: transform;
         }
         
         .cursor-dot {
             width: var(--cursor-size); height: var(--cursor-size);
             background-color: var(--primary); 
-            transition: width 0.2s, height 0.2s, background-color 0.2s;
+            transition: background-color 0.2s; /* Removidos transitions de left/top para evitar reflow */
         }
 
         .cursor-trail {
@@ -201,10 +210,15 @@
         .card-image-container img {
             width: 100%; height: 100%; object-fit: cover;
             transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s;
-            filter: grayscale(80%) sepia(20%) brightness(0.8); -webkit-user-drag: none;
+            /* SVG LIQUID FILTER APLICADO AQUI */
+            filter: grayscale(80%) sepia(20%) brightness(0.8) url(#liquid-filter); 
+            -webkit-user-drag: none;
+            transform: scale(1.05) translate(var(--px, 0px), var(--py, 0px));
+            will-change: transform, filter;
         }
         .project-card-3d:hover .card-image-container img {
-            transform: scale(1.08); filter: grayscale(0%) sepia(10%) brightness(1);
+            transform: scale(1.15) translate(calc(var(--px, 0px) * 1.5), calc(var(--py, 0px) * 1.5));
+            filter: grayscale(0%) sepia(10%) brightness(1) url(#liquid-filter);
         }
 
         #preloader {
@@ -273,8 +287,12 @@
         .hud-tl { display: none; top: 100px; left: 30px; writing-mode: vertical-rl; transform: rotate(180deg); }
         @media(min-width: 768px) { .hud-tl { display: block; } }
 
-        .hud-line { display: none; width: 1px; height: 15vh; background: rgba(245,238,220,0.15); position: fixed; right: 30px; top: 50%; transform: translateY(-50%); }
-        @media(min-width: 768px) { .hud-line { display: block; } }
+        /* Estilo do Ponto Ativo no HUD */
+        .dot-inner.active {
+            background-color: var(--accent);
+            transform: scale(2);
+            box-shadow: 0 0 10px rgba(212,175,55,0.8);
+        }
 
         #flash-overlay {
             position: fixed; inset: 0; background: var(--primary); z-index: 9998;
@@ -353,19 +371,59 @@
 </head>
 <body class="antialiased hidden-overflow no-scroll selection:bg-white selection:text-black">
 
-    <!-- HUD -->
-    <div class="hud-element hud-bl">
+    <!-- ACESSIBILIDADE: Título invisível para Leitores de Ecrã -->
+    <h1 class="sr-only">SONIEN'S Alta Costura - Experiência Interativa 3D</h1>
+
+    <!-- EFEITO ORGÂNICO: Filtro SVG de Distorção "Seda / Água" -->
+    <svg style="width:0; height:0; position:absolute;" aria-hidden="true" focusable="false">
+        <defs>
+            <filter id="liquid-filter">
+                <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G" id="liquid-map" />
+            </filter>
+        </defs>
+    </svg>
+
+    <!-- HUD (Indicador Espacial Z) -->
+    <div class="hud-element hud-bl" aria-hidden="true">
         <div id="hud-coords">COLEÇÃO: ESSÊNCIA</div>
         <div>ALFAIATARIA: <span id="network-status" style="color: var(--accent);">PREMIUM</span></div>
     </div>
-    <div class="hud-element hud-br">
+    <div class="hud-element hud-br" aria-hidden="true">
         <div>ATELIER: <span id="crystal-count">ABERTO</span></div>
         <div>ESTADO: <span id="hud-status">INATIVO</span></div>
     </div>
-    <div class="hud-element hud-tl">
+    <div class="hud-element hud-tl" aria-hidden="true">
         SONIEN'S // ALTA COSTURA
     </div>
-    <div class="hud-line"></div>
+
+    <!-- HUD NAV / TIMELINE VERTICAL -->
+    <nav id="hud-nav" aria-label="Navegação Rápida" class="fixed right-8 top-1/2 -translate-y-1/2 z-50 hidden md:flex flex-col items-center gap-10 opacity-0 transition-opacity duration-1000 pointer-events-none">
+        <!-- Linha Guia -->
+        <div class="absolute top-0 bottom-0 w-[1px] bg-white/10 left-1/2 -translate-x-1/2 -z-10"></div>
+        
+        <!-- Pontos Interativos (Com suporte para Teclado via tabindex) -->
+        <div tabindex="0" role="button" aria-label="Ir para Início" class="hud-dot relative cursor-pointer group hover-trigger p-2" onclick="SoundManager.playClick(); window.scrollToSection(0)" onkeydown="if(event.key==='Enter') this.click()">
+            <span class="absolute right-8 top-1/2 -translate-y-1/2 text-[9px] font-mono tracking-widest text-[#d4af37] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase pointer-events-none">Início</span>
+            <div class="w-1.5 h-1.5 rounded-full bg-white/30 transition-all duration-500 dot-inner" data-z="0"></div>
+        </div>
+        <div tabindex="0" role="button" aria-label="Ir para Coleções" class="hud-dot relative cursor-pointer group hover-trigger p-2" onclick="SoundManager.playClick(); window.scrollToSection(1000)" onkeydown="if(event.key==='Enter') this.click()">
+            <span class="absolute right-8 top-1/2 -translate-y-1/2 text-[9px] font-mono tracking-widest text-[#d4af37] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase pointer-events-none">Coleções</span>
+            <div class="w-1.5 h-1.5 rounded-full bg-white/30 transition-all duration-500 dot-inner" data-z="1000"></div>
+        </div>
+        <div tabindex="0" role="button" aria-label="Ir para O Atelier" class="hud-dot relative cursor-pointer group hover-trigger p-2" onclick="SoundManager.playClick(); window.scrollToSection(2000)" onkeydown="if(event.key==='Enter') this.click()">
+            <span class="absolute right-8 top-1/2 -translate-y-1/2 text-[9px] font-mono tracking-widest text-[#d4af37] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase pointer-events-none">O Atelier</span>
+            <div class="w-1.5 h-1.5 rounded-full bg-white/30 transition-all duration-500 dot-inner" data-z="2000"></div>
+        </div>
+        <div tabindex="0" role="button" aria-label="Ir para Contacto" class="hud-dot relative cursor-pointer group hover-trigger p-2" onclick="SoundManager.playClick(); window.scrollToSection(3000)" onkeydown="if(event.key==='Enter') this.click()">
+            <span class="absolute right-8 top-1/2 -translate-y-1/2 text-[9px] font-mono tracking-widest text-[#d4af37] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase pointer-events-none">Contacto</span>
+            <div class="w-1.5 h-1.5 rounded-full bg-white/30 transition-all duration-500 dot-inner" data-z="3000"></div>
+        </div>
+        <div tabindex="0" role="button" aria-label="Ir para o Fim da Página" class="hud-dot relative cursor-pointer group hover-trigger p-2" onclick="SoundManager.playClick(); window.scrollToSection(4000)" onkeydown="if(event.key==='Enter') this.click()">
+            <span class="absolute right-8 top-1/2 -translate-y-1/2 text-[9px] font-mono tracking-widest text-[#d4af37] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase pointer-events-none">Fim</span>
+            <div class="w-1.5 h-1.5 rounded-full bg-white/30 transition-all duration-500 dot-inner" data-z="4000"></div>
+        </div>
+    </nav>
 
     <!-- PRELOADER -->
     <div id="preloader">
@@ -375,7 +433,7 @@
                 <div class="w-full h-[1px] bg-gray-800 overflow-hidden mb-2 relative">
                     <div id="loader-bar" class="loader-bar absolute top-0 left-0"></div>
                 </div>
-                <div class="flex justify-between w-full text-[10px] font-mono text-gray-500 uppercase">
+                <div class="flex justify-between w-full text-[10px] font-mono text-gray-500 uppercase" aria-live="polite">
                     <span>A Preparar Coleção</span>
                     <span id="loader-percent">0%</span>
                 </div>
@@ -397,32 +455,32 @@
 Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         </div>
         <div class="flex justify-center md:justify-end">
-            <button id="enter-world-btn" aria-label="Descobrir Coleção" class="isekai-btn hover-trigger solar-text magnetic-btn" data-value="DESCOBRIR COLEÇÃO">DESCOBRIR COLEÇÃO</button>
+            <button tabindex="0" id="enter-world-btn" aria-label="Descobrir Coleção" class="isekai-btn hover-trigger solar-text magnetic-btn" data-value="DESCOBRIR COLEÇÃO">DESCOBRIR COLEÇÃO</button>
         </div>
     </div>
 
     <!-- BACKGROUND (Three.js) -->
-    <canvas id="webgl-canvas" class="fixed top-0 left-0 w-full h-full -z-10"></canvas>
+    <canvas id="webgl-canvas" aria-hidden="true" class="fixed top-0 left-0 w-full h-full -z-10"></canvas>
     
     <!-- NOISE -->
     <div class="noise-overlay"></div>
 
     <!-- DUAL CURSOR -->
-    <div class="cursor-dot"></div>
-    <div class="cursor-trail"></div>
+    <div class="cursor-dot" aria-hidden="true"></div>
+    <div class="cursor-trail" aria-hidden="true"></div>
 
     <!-- MOBILE MENU -->
     <div id="mobile-menu" aria-hidden="true">
-        <a href="#" class="text-4xl brand-logo-text mb-8 mobile-link solar-text text-white hover-trigger magnetic-btn" data-nav-to="1000" data-value="Coleções">Coleções</a>
-        <a href="#" class="text-4xl brand-logo-text mb-8 mobile-link solar-text text-white hover-trigger magnetic-btn" data-nav-to="2000" data-value="O Atelier">O Atelier</a>
-        <a href="#" class="text-4xl brand-logo-text mb-8 mobile-link solar-text text-white hover-trigger magnetic-btn" data-nav-to="3000" data-value="Contacto">Contacto</a>
+        <a tabindex="0" href="#" class="text-4xl brand-logo-text mb-8 mobile-link solar-text text-white hover-trigger magnetic-btn" data-nav-to="1000" data-value="Coleções">Coleções</a>
+        <a tabindex="0" href="#" class="text-4xl brand-logo-text mb-8 mobile-link solar-text text-white hover-trigger magnetic-btn" data-nav-to="2000" data-value="O Atelier">O Atelier</a>
+        <a tabindex="0" href="#" class="text-4xl brand-logo-text mb-8 mobile-link solar-text text-white hover-trigger magnetic-btn" data-nav-to="3000" data-value="Contacto">Contacto</a>
     </div>
 
     <!-- NAVIGATION -->
-    <nav class="fixed top-0 w-full p-6 md:p-10 flex justify-between items-center z-50 opacity-0" id="main-nav">
+    <nav class="fixed top-0 w-full p-6 md:p-10 flex justify-between items-center z-50 opacity-0" id="main-nav" aria-label="Navegação Principal">
         <!-- Substituído AETHER por Logo SONIEN'S formatada -->
-        <div class="text-2xl font-bold brand-logo-text hover-trigger z-50 cursor-pointer magnetic-btn flex items-center gap-3" onclick="window.scrollToSection(0)">
-            <svg class="w-6 h-6" viewBox="0 0 100 100">
+        <div tabindex="0" role="button" aria-label="Ir para o Início" class="text-2xl font-bold brand-logo-text hover-trigger z-50 cursor-pointer magnetic-btn flex items-center gap-3" onclick="SoundManager.playClick(); window.scrollToSection(0)" onkeydown="if(event.key==='Enter') this.click()">
+            <svg class="w-6 h-6" viewBox="0 0 100 100" aria-hidden="true">
                 <circle cx="50" cy="50" r="48" fill="transparent" stroke="currentColor" stroke-width="2"/>
                 <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" stroke-width="2"/>
                 <line x1="50" y1="15" x2="50" y2="85" stroke="currentColor" stroke-width="2"/>
@@ -432,33 +490,33 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         </div>
         
         <div id="nav-links" class="hidden md:flex gap-12 font-mono text-[10px] tracking-widest text-gray-400 opacity-0 pointer-events-none uppercase">
-            <a href="#" class="hover:text-white transition-colors hover-trigger magnetic-btn solar-text" data-value="Coleções" onclick="window.scrollToSection(1000)">Coleções</a>
-            <a href="#" class="hover:text-white transition-colors hover-trigger magnetic-btn solar-text" data-value="O Atelier" onclick="window.scrollToSection(2000)">O Atelier</a>
-            <a href="#" class="hover:text-white transition-colors hover-trigger magnetic-btn solar-text" data-value="Contacto" onclick="window.scrollToSection(3000)">Contacto</a>
+            <a tabindex="0" href="#" class="hover:text-white transition-colors hover-trigger magnetic-btn solar-text" data-value="Coleções" onclick="SoundManager.playClick(); window.scrollToSection(1000)">Coleções</a>
+            <a tabindex="0" href="#" class="hover:text-white transition-colors hover-trigger magnetic-btn solar-text" data-value="O Atelier" onclick="SoundManager.playClick(); window.scrollToSection(2000)">O Atelier</a>
+            <a tabindex="0" href="#" class="hover:text-white transition-colors hover-trigger magnetic-btn solar-text" data-value="Contacto" onclick="SoundManager.playClick(); window.scrollToSection(3000)">Contacto</a>
         </div>
         
-        <button id="nav-cta" aria-label="Agendar Prova" class="hidden md:block border border-white/20 px-6 py-2 rounded-full text-[10px] font-mono tracking-widest hover:bg-white hover:text-black transition-colors duration-500 hover-trigger open-contact-btn opacity-0 pointer-events-none magnetic-btn uppercase solar-text" data-value="Agendar Prova">
+        <button tabindex="0" id="nav-cta" aria-label="Agendar Prova" class="hidden md:block border border-white/20 px-6 py-2 rounded-full text-[10px] font-mono tracking-widest hover:bg-white hover:text-black transition-colors duration-500 hover-trigger open-contact-btn opacity-0 pointer-events-none magnetic-btn uppercase solar-text" data-value="Agendar Prova">
             Agendar Prova
         </button>
 
         <!-- HAMBURGER BUTTON -->
-        <button id="hamburger-btn" aria-label="Abrir Menu" aria-expanded="false" class="md:hidden z-50 flex flex-col gap-1.5 p-4 -m-4 hover-trigger magnetic-btn">
+        <button tabindex="0" id="hamburger-btn" aria-label="Abrir Menu" aria-expanded="false" class="md:hidden z-50 flex flex-col gap-1.5 p-4 -m-4 hover-trigger magnetic-btn">
             <div class="hamburger-line origin-center"></div>
             <div class="hamburger-line origin-center"></div>
         </button>
     </nav>
 
     <!-- 3D VIEWPORT -->
-    <div id="viewport">
+    <div id="viewport" aria-live="polite">
         <!-- HERO (Z = 0) -->
-        <section class="section-3d" data-z="0">
+        <section class="section-3d" data-z="0" aria-label="Secção Inicial">
             <div class="flex flex-col justify-center items-center px-6 text-center max-w-5xl">
                 <p class="font-mono text-gray-400 mb-6 text-xs tracking-[0.5em] solar-text uppercase" data-value="ALTA COSTURA & DESIGN">ALTA COSTURA & DESIGN</p>
                 
                 <div class="flex flex-col items-center mb-8 relative z-10 w-full">
                     <!-- Modificado para incluir a animação hero-shine-text sem mix-blend-overlay para ser visível -->
-                    <h1 class="brand-logo-text text-[15vw] leading-[0.9] solar-text hero-shine-text" data-value="Sonien's">Sonien's</h1>
-                    <h1 class="font-display italic text-[4vw] tracking-widest text-gray-300 mt-2 solar-text" data-value="A Essência do Estilo">A Essência do Estilo</h1>
+                    <h2 class="brand-logo-text text-[15vw] leading-[0.9] solar-text hero-shine-text" data-value="Sonien's">Sonien's</h2>
+                    <p class="font-display italic text-[4vw] tracking-widest text-gray-300 mt-2 solar-text" data-value="A Essência do Estilo">A Essência do Estilo</p>
                 </div>
 
                 <p class="hidden md:block max-w-2xl mx-auto text-center text-sm text-gray-400 font-light leading-relaxed mt-6 solar-text" 
@@ -472,7 +530,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 </p>
                 
                 <div class="absolute bottom-12 left-1/2 -translate-x-1/2">
-                    <div class="flex flex-col items-center gap-4 hover-trigger cursor-pointer magnetic-btn" onclick="window.scrollToSection(1000)">
+                    <div tabindex="0" role="button" aria-label="Explorar Coleções" class="flex flex-col items-center gap-4 hover-trigger cursor-pointer magnetic-btn" onclick="SoundManager.playClick(); window.scrollToSection(1000)" onkeydown="if(event.key==='Enter') this.click()">
                         <span class="text-[9px] font-mono tracking-widest text-gray-500 uppercase">Explorar as Coleções</span>
                         <div class="w-[1px] h-12 bg-gradient-to-b from-[#d4af37] to-transparent opacity-50"></div>
                     </div>
@@ -481,47 +539,48 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         </section>
 
         <!-- PROJECTS (Z = 1000) -->
-        <section class="section-3d" data-z="1000" id="work">
+        <section class="section-3d" data-z="1000" id="work" aria-label="Coleções de Assinatura">
             <div class="w-full flex flex-col items-center">
                 <div class="flex flex-col justify-center items-center mb-8 md:mb-12 gap-2 px-6 text-center pt-16 md:pt-0">
                     <h2 class="text-4xl md:text-6xl font-display italic text-white solar-text" data-value="Peças de Assinatura">Peças de Assinatura</h2>
                     <p class="font-mono text-gray-500 text-xs tracking-widest uppercase solar-text" data-value="Coleções Exclusivas">Coleções Exclusivas</p>
+                    <p class="md:hidden font-mono text-gray-600 mt-2 text-[9px] uppercase tracking-widest opacity-60">Arraste para explorar</p>
                 </div>
                 
-                <div class="carousel-3d-wrapper">
+                <div class="carousel-3d-wrapper" role="region" aria-label="Carrossel de Coleções. Use as setas esquerda e direita para navegar.">
                     <div class="carousel-3d-stage" id="carousel-stage"></div>
                 </div>
             </div>
         </section>
 
         <!-- SERVICES (Z = 2000) -->
-        <section class="section-3d" data-z="2000" id="about">
-            <div id="service-img-left" class="holo-container hidden min-[1921px]:block absolute left-[10%] top-1/2 -translate-y-1/2 w-96 h-[32rem] border border-white/5 z-0 [perspective:1000px]">
+        <section class="section-3d" data-z="2000" id="about" aria-label="O Nosso Atelier">
+            <div id="service-img-left" class="holo-container hidden min-[1921px]:block absolute left-[10%] top-1/2 -translate-y-1/2 w-96 h-[32rem] border border-white/5 z-0 [perspective:1000px]" aria-hidden="true">
                 <div class="holo-border-line line-top"></div><div class="holo-border-line line-right"></div>
                 <div class="holo-border-line line-bottom"></div><div class="holo-border-line line-left"></div>
                 <div class="holo-mask w-full h-full absolute bottom-0 left-0 overflow-hidden">
                     <div class="holo-scanline"></div>
                     <div class="service-img-inner w-full h-full transition-transform duration-100 ease-out">
-                        <img src="" alt="Detalhe do Atelier" class="w-full h-full object-cover opacity-80 mix-blend-screen aether-float">
+                        <img src="" alt="" class="w-full h-full object-cover opacity-80 mix-blend-screen aether-float">
                     </div>
                 </div>
             </div>
 
-            <div id="service-img-right" class="holo-container hidden md:block absolute right-[10%] top-1/2 -translate-y-1/2 w-96 h-[32rem] border border-white/5 z-0 [perspective:1000px]">
+            <div id="service-img-right" class="holo-container hidden md:block absolute right-[10%] top-1/2 -translate-y-1/2 w-96 h-[32rem] border border-white/5 z-0 [perspective:1000px]" aria-hidden="true">
                 <div class="holo-border-line line-top"></div><div class="holo-border-line line-right"></div>
                 <div class="holo-border-line line-bottom"></div><div class="holo-border-line line-left"></div>
                 <div class="holo-mask w-full h-full absolute bottom-0 left-0 overflow-hidden">
                     <div class="holo-scanline"></div>
                     <div class="service-img-inner w-full h-full transition-transform duration-100 ease-out">
-                        <img src="" alt="Processo Criativo" class="w-full h-full object-cover opacity-80 mix-blend-screen aether-float">
+                        <img src="" alt="" class="w-full h-full object-cover opacity-80 mix-blend-screen aether-float">
                     </div>
                 </div>
             </div>
 
             <div class="max-w-5xl w-full px-4 md:px-8 relative z-10">
                 <h2 class="text-[10px] font-mono text-gray-500 mb-12 tracking-[0.5em] border-b border-white/10 pb-4 uppercase solar-text" data-value="Nosso Atelier">Nosso Atelier</h2>
-                <div class="space-y-0">
-                    <div class="service-item border-b border-white/10 py-10 cursor-pointer group hover:pl-4 transition-all duration-500 hover-trigger" onclick="toggleService(this)">
+                <div class="space-y-0" role="list">
+                    <div tabindex="0" role="listitem" aria-expanded="false" class="service-item border-b border-white/10 py-10 cursor-pointer group hover:pl-4 transition-all duration-500 hover-trigger" onclick="toggleService(this)" onkeydown="if(event.key==='Enter') this.click()">
                         <div class="flex justify-between items-baseline">
                             <h3 class="text-4xl md:text-6xl font-display italic text-gray-400 group-hover:text-white transition-colors solar-text" data-value="Materiais Premium">Materiais Premium</h3>
                             <span class="font-mono text-xs text-[#d4af37] opacity-60 group-hover:opacity-100 solar-text" data-value="01">01</span>
@@ -532,7 +591,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                             </p>
                         </div>
                     </div>
-                    <div class="service-item border-b border-white/10 py-10 cursor-pointer group hover:pl-4 transition-all duration-500 hover-trigger" onclick="toggleService(this)">
+                    <div tabindex="0" role="listitem" aria-expanded="false" class="service-item border-b border-white/10 py-10 cursor-pointer group hover:pl-4 transition-all duration-500 hover-trigger" onclick="toggleService(this)" onkeydown="if(event.key==='Enter') this.click()">
                         <div class="flex justify-between items-baseline">
                             <h3 class="text-4xl md:text-6xl font-display italic text-gray-400 group-hover:text-white transition-colors solar-text" data-value="Design Autoral">Design Autoral</h3>
                             <span class="font-mono text-xs text-[#d4af37] opacity-60 group-hover:opacity-100 solar-text" data-value="02">02</span>
@@ -543,7 +602,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                             </p>
                         </div>
                     </div>
-                    <div class="service-item border-b border-white/10 py-10 cursor-pointer group hover:pl-4 transition-all duration-500 hover-trigger" onclick="toggleService(this)">
+                    <div tabindex="0" role="listitem" aria-expanded="false" class="service-item border-b border-white/10 py-10 cursor-pointer group hover:pl-4 transition-all duration-500 hover-trigger" onclick="toggleService(this)" onkeydown="if(event.key==='Enter') this.click()">
                         <div class="flex justify-between items-baseline">
                             <h3 class="text-4xl md:text-6xl font-display italic text-gray-400 group-hover:text-white transition-colors solar-text" data-value="Corte Preciso">Corte Preciso</h3>
                             <span class="font-mono text-xs text-[#d4af37] opacity-60 group-hover:opacity-100 solar-text" data-value="03">03</span>
@@ -559,14 +618,14 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         </section>
 
         <!-- CONTACT (Z = 3000) -->
-        <section class="section-3d" data-z="3000" id="contact">
+        <section class="section-3d" data-z="3000" id="contact" aria-label="Área de Contacto">
             <div class="text-center px-4">
                 <p class="font-mono text-gray-500 mb-8 text-xs tracking-widest solar-text uppercase" data-value="EXPERIMENTE O EXCLUSIVO">EXPERIMENTE O EXCLUSIVO</p>
-                <h2 class="text-5xl md:text-9xl font-display italic mb-12 hover-trigger text-white mix-blend-difference cursor-pointer open-contact-btn magnetic-btn inline-block solar-text" data-value="Agende &#10; Uma Prova">
+                <h2 tabindex="0" role="button" aria-label="Abrir formulário para agendar prova" class="text-5xl md:text-9xl font-display italic mb-12 hover-trigger text-white mix-blend-difference cursor-pointer open-contact-btn magnetic-btn inline-block solar-text outline-none focus-visible:scale-105 transition-transform" data-value="Agende &#10; Uma Prova" onkeydown="if(event.key==='Enter') this.click()">
                     Agende <br> Uma Prova
                 </h2>
                 <div class="mt-4 flex justify-center">
-                    <button aria-label="Abrir Formulário de Atendimento" class="border border-[#d4af37]/50 text-[#d4af37] px-10 py-4 rounded-full text-xs font-mono tracking-widest hover:bg-[#d4af37] hover:text-black transition-colors duration-500 hover-trigger open-contact-btn magnetic-btn uppercase solar-text" data-value="Contactar Atelier">
+                    <button tabindex="0" aria-label="Abrir Formulário de Atendimento" class="border border-[#d4af37]/50 text-[#d4af37] px-10 py-4 rounded-full text-xs font-mono tracking-widest hover:bg-[#d4af37] hover:text-black transition-colors duration-500 hover-trigger open-contact-btn magnetic-btn uppercase solar-text" data-value="Contactar Atelier">
                         Contactar Atelier
                     </button>
                 </div>
@@ -574,16 +633,16 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         </section>
 
         <!-- FOOTER (Z = 4000) -->
-        <section class="section-3d" data-z="4000" id="footer-section">
+        <section class="section-3d" data-z="4000" id="footer-section" aria-label="Rodapé do Site">
             <div class="flex flex-col items-center justify-center text-center gap-12 w-full px-6">
-                <div class="text-6xl brand-logo-text tracking-tighter footer-shine-text">SONIEN'S</div>
+                <div class="text-6xl brand-logo-text tracking-tighter footer-shine-text" aria-hidden="true">SONIEN'S</div>
                 <div class="flex gap-12 items-center justify-center font-mono text-xs text-gray-400 uppercase">
-                    <a href="#" class="flex flex-col items-center gap-4 hover:text-[#d4af37] transition-colors hover-trigger magnetic-btn group">
-                        <i data-lucide="instagram" class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity"></i>
+                    <a tabindex="0" href="#" aria-label="Visitar o nosso Instagram" class="flex flex-col items-center gap-4 hover:text-[#d4af37] transition-colors hover-trigger magnetic-btn group">
+                        <i data-lucide="instagram" class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
                         <span class="solar-text" data-value="Instagram">Instagram</span>
                     </a>
-                    <a href="#" class="flex flex-col items-center gap-4 hover:text-[#d4af37] transition-colors hover-trigger magnetic-btn group">
-                        <i data-lucide="map-pin" class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity"></i>
+                    <a tabindex="0" href="#" aria-label="Ver localização da Boutique" class="flex flex-col items-center gap-4 hover:text-[#d4af37] transition-colors hover-trigger magnetic-btn group">
+                        <i data-lucide="map-pin" class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
                         <span class="solar-text" data-value="Boutique">Boutique</span>
                     </a>
                 </div>
@@ -596,27 +655,27 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
     </div>
 
     <!-- DEDICATED PAGE (Substitui o antigo Project Modal) -->
-    <div id="dedicated-page" class="fixed inset-0 z-[10000] bg-[var(--bg-color)] overflow-y-auto hidden opacity-0 transition-opacity duration-700 pointer-events-none">
+    <div id="dedicated-page" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Detalhes da Coleção Selecionada" class="fixed inset-0 z-[10000] bg-[var(--bg-color)] overflow-y-auto hidden opacity-0 transition-opacity duration-700 pointer-events-none">
         <div class="noise-overlay"></div>
         
         <!-- Header / Back Button -->
         <div class="sticky top-0 w-full p-6 md:p-10 flex justify-between items-center z-50 bg-[#0d0c0b]/90 backdrop-blur-md border-b border-white/5">
-            <button id="btn-back-page" class="text-white hover-trigger magnetic-btn flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest hover:text-[#d4af37] transition-colors">
-                <i data-lucide="arrow-left" class="w-5 h-5"></i> Voltar às Coleções
+            <button tabindex="0" id="btn-back-page" aria-label="Voltar às Coleções" class="text-white hover-trigger magnetic-btn flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest hover:text-[#d4af37] transition-colors">
+                <i data-lucide="arrow-left" class="w-5 h-5" aria-hidden="true"></i> Voltar às Coleções
             </button>
-            <div class="brand-logo-text text-xl tracking-widest text-[#d4af37]">SONIEN'S</div>
+            <div class="brand-logo-text text-xl tracking-widest text-[#d4af37]" aria-hidden="true">SONIEN'S</div>
         </div>
 
         <!-- Content -->
         <div class="max-w-7xl mx-auto px-6 py-12 md:py-20 flex flex-col lg:flex-row gap-12 lg:gap-20">
             <!-- Left: Hero/Info -->
             <div class="flex-1 flex flex-col justify-center">
-                <span id="page-tag" class="text-[10px] font-mono text-[#d4af37] border border-[#d4af37]/30 px-3 py-1 uppercase tracking-widest mb-6 inline-block self-start"></span>
-                <h1 id="page-title" class="text-5xl md:text-7xl font-display italic text-white mb-6"></h1>
-                <p id="page-desc" class="text-gray-400 font-light leading-relaxed text-sm md:text-base mb-12"></p>
+                <span id="page-tag" class="text-[10px] font-mono text-[#d4af37] border border-[#d4af37]/30 px-3 py-1 uppercase tracking-widest mb-6 inline-block self-start solar-text" aria-live="polite"></span>
+                <h2 id="page-title" class="text-5xl md:text-7xl font-display italic text-white mb-6 solar-text" aria-live="polite"></h2>
+                <p id="page-desc" class="text-gray-400 font-light leading-relaxed text-sm md:text-base mb-12 whitespace-pre-line solar-text" aria-live="polite"></p>
                 
                 <div class="w-full h-72 md:h-[450px] overflow-hidden border border-white/10 relative group">
-                    <img id="page-image" src="" class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" alt="Arte da Coleção">
+                    <img id="page-image" src="" class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" alt="Fotografia de arte da coleção">
                 </div>
             </div>
             
@@ -629,14 +688,14 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 
                 <div class="space-y-6 w-full">
                     <div>
-                        <label class="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-2 block">Seu Nome / Contato</label>
-                        <input id="dp-name" type="text" class="form-input hover-trigger" placeholder="Nome Completo">
+                        <label for="dp-name" class="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-2 block">Seu Nome / Contato</label>
+                        <input id="dp-name" tabindex="0" type="text" class="form-input hover-trigger" placeholder="Nome Completo">
                     </div>
                     
                     <div class="grid grid-cols-2 gap-6">
                         <div>
-                            <label class="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-2 block">Tamanho</label>
-                            <select id="dp-size" class="form-input hover-trigger bg-transparent appearance-none cursor-pointer text-white">
+                            <label for="dp-size" class="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-2 block">Tamanho</label>
+                            <select id="dp-size" tabindex="0" class="form-input hover-trigger bg-transparent appearance-none cursor-pointer text-white">
                                 <option value="" disabled selected class="bg-[#0d0c0b] text-gray-500">Escolha...</option>
                                 <option value="P" class="bg-[#0d0c0b]">P</option>
                                 <option value="M" class="bg-[#0d0c0b]">M</option>
@@ -646,8 +705,8 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                             </select>
                         </div>
                         <div>
-                            <label class="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-2 block">Cor Base</label>
-                            <select id="dp-color" class="form-input hover-trigger bg-transparent appearance-none cursor-pointer text-white">
+                            <label for="dp-color" class="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-2 block">Cor Base</label>
+                            <select id="dp-color" tabindex="0" class="form-input hover-trigger bg-transparent appearance-none cursor-pointer text-white">
                                 <option value="" disabled selected class="bg-[#0d0c0b] text-gray-500">Escolha...</option>
                                 <option value="Preto" class="bg-[#0d0c0b]">Preto Absoluto</option>
                                 <option value="Branco" class="bg-[#0d0c0b]">Branco Puro</option>
@@ -658,11 +717,11 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                     </div>
                     
                     <div>
-                        <label class="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-2 block">Ideia da Estampa</label>
-                        <textarea id="dp-msg" class="form-input hover-trigger resize-none" rows="3" placeholder="Qual personagem, cena ou citação deseja? Detalhe a sua ideia..."></textarea>
+                        <label for="dp-msg" class="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-2 block">Ideia da Estampa</label>
+                        <textarea id="dp-msg" tabindex="0" class="form-input hover-trigger resize-none" rows="3" placeholder="Qual personagem, cena ou citação deseja? Detalhe a sua ideia..."></textarea>
                     </div>
                     
-                    <button id="dp-submit" class="w-full bg-[#d4af37] text-black font-mono font-bold text-xs py-5 hover:bg-white transition-colors tracking-widest mt-8 hover-trigger magnetic-btn uppercase">
+                    <button id="dp-submit" tabindex="0" class="w-full bg-[#d4af37] text-black font-mono font-bold text-xs py-5 hover:bg-white transition-colors tracking-widest mt-8 hover-trigger magnetic-btn uppercase">
                         Solicitar Criação
                     </button>
                 </div>
@@ -674,10 +733,10 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
     </div>
 
     <!-- CONTACT FORM MODAL (Mantido para Contato Geral) -->
-    <div id="contact-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="contact-title">
+    <div id="contact-modal" aria-hidden="true" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="contact-title">
         <div class="modal-content max-w-4xl bg-[#0d0c0b] border border-white/10 p-0 flex flex-row overflow-hidden relative"> 
-            <button id="close-contact" aria-label="Fechar Contacto" class="absolute top-6 right-6 text-white hover:rotate-90 transition-transform hover-trigger z-50 magnetic-btn">
-                <i data-lucide="x" class="w-6 h-6"></i>
+            <button id="close-contact" tabindex="0" aria-label="Fechar Contacto" class="absolute top-6 right-6 text-white hover:rotate-90 transition-transform hover-trigger z-50 magnetic-btn">
+                <i data-lucide="x" class="w-6 h-6" aria-hidden="true"></i>
             </button>
             <div class="hidden md:flex w-24 bg-[#d4af37]/5 border-r border-white/5 flex-col justify-center items-center py-10 relative overflow-hidden">
                  <h2 id="contact-title" class="brand-logo-text text-4xl tracking-widest text-[#d4af37]/20 whitespace-nowrap absolute" style="writing-mode: vertical-rl; transform: rotate(180deg);">SONIEN'S</h2>
@@ -686,10 +745,19 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 <h3 class="text-3xl font-display italic text-white mb-2">Atendimento VIP</h3>
                 <p class="text-gray-500 font-mono text-xs mb-10 uppercase">Permita-nos conhecer as suas preferências.</p>
                 <div class="space-y-8 w-full">
-                    <div><input id="form-name" type="text" aria-label="O seu nome" class="form-input hover-trigger" placeholder="NOME COMPLETO"></div>
-                    <div><input id="form-email" type="email" aria-label="Email de contacto" class="form-input hover-trigger" placeholder="EMAIL DE CONTACTO"></div>
-                    <div><textarea id="form-msg" aria-label="Peça de interesse ou detalhes" class="form-input hover-trigger" rows="1" placeholder="QUAL PEÇA DESEJA EXPERIMENTAR?"></textarea></div>
-                    <button id="submit-whatsapp" aria-label="Enviar Mensagem" class="w-full bg-[#d4af37] text-black font-mono font-bold text-xs py-4 hover:bg-white transition-colors tracking-widest mt-4 hover-trigger magnetic-btn uppercase">
+                    <div>
+                        <label for="form-name" class="sr-only">Nome Completo</label>
+                        <input id="form-name" tabindex="0" type="text" class="form-input hover-trigger" placeholder="NOME COMPLETO">
+                    </div>
+                    <div>
+                        <label for="form-email" class="sr-only">E-mail de Contacto</label>
+                        <input id="form-email" tabindex="0" type="email" class="form-input hover-trigger" placeholder="EMAIL DE CONTACTO">
+                    </div>
+                    <div>
+                        <label for="form-msg" class="sr-only">Peça de interesse ou detalhes</label>
+                        <textarea id="form-msg" tabindex="0" class="form-input hover-trigger" rows="1" placeholder="QUAL PEÇA DESEJA EXPERIMENTAR?"></textarea>
+                    </div>
+                    <button id="submit-whatsapp" tabindex="0" aria-label="Enviar Mensagem de Agendamento" class="w-full bg-[#d4af37] text-black font-mono font-bold text-xs py-4 hover:bg-white transition-colors tracking-widest mt-4 hover-trigger magnetic-btn uppercase">
                         Solicitar Agendamento
                     </button>
                 </div>
@@ -700,7 +768,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
     <script>
         // GLOBAL STATE
         let introCompleted = false;
-        let isDedicatedPageOpen = false; // <-- Nova variável de estado
+        let isDedicatedPageOpen = false; 
         let scrollZ = 0;
         let targetScrollZ = 0;
         const sectionDistance = 1000;
@@ -716,47 +784,49 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             ["https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=1000&auto=format&fit=crop", "https://images.unsplash.com/photo-1594938328870-982424b41300?q=80&w=1000&auto=format&fit=crop"]  // 03: Corte Preciso (Alfaiate a medir tecido, corte exato e manequim)
         ];
 
-        // DATA - Adaptação para Camisetas Temáticas SONIEN'S
+        // DATA 
         const projects = [
             {
                 title: "Sétima Arte",
-                desc: "Uma homenagem aos clássicos do cinema e produções inesquecíveis. Transformamos cenas icônicas, citações marcantes e pôsteres em estampas exclusivas para camisetas premium.",
+                desc: "A magia da tela grande, agora esculpida em fios de algodão premium. A coleção Sétima Arte é um tributo visceral aos clássicos do cinema e às produções que moldaram gerações. Mais do que meras estampas, capturamos a alma de cenas icônicas, a profundidade de citações inesquecíveis e a estética inconfundível de pôsteres lendários. Cada peça é desenhada à mão, traduzindo o dramatismo do cinema para o minimalismo sofisticado da alta costura urbana.\n\nSUGESTÕES DE ATELIER:\n• Silhuetas noir de obras clássicas do suspense.\n• Citações tipográficas elegantes e minimalistas.\n• Releituras geométricas de cenários inesquecíveis.",
                 year: "CINE '26", tag: "FILMES & SÉRIES",
                 image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=2670&auto=format&fit=crop" 
             },
             {
                 title: "Cultura Otaku",
-                desc: "A energia das animações japonesas estampada com design autoral. Seus personagens favoritos, painéis de mangá e símbolos clássicos recriados com estilo e precisão.",
+                desc: "Elevamos a paixão pela animação japonesa ao patamar do design de luxo. Longe das estampas convencionais, a coleção Cultura Otaku foca-se na essência geométrica e na energia crua das obras orientais. Reimaginamos painéis clássicos de mangá com traços finos, isolamos símbolos de poder e recriamos a aura dos seus personagens favoritos com uma paleta de cores neutras e traços marcantes. Uma forma madura e incrivelmente estilosa de carregar a sua obra favorita.\n\nSUGESTÕES DE ATELIER:\n• Painéis de mangá em estilo sketch monocromático.\n• Feições de personagens com acabamento em hachura.\n• Símbolos de clãs minimalistas finamente desenhados.",
                 year: "JAPAN '26", tag: "ANIMES & MANGÁS",
                 image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=2670&auto=format&fit=crop" 
             },
             {
                 title: "Páginas Literárias",
-                desc: "Para os amantes da leitura. Transforme trechos que marcaram sua vida, mapas de mundos fantásticos e artes de capas de livros em vestuário de alta qualidade.",
+                desc: "A literatura ganha textura, caimento e forma. A coleção Páginas Literárias foi concebida para quem encontra refúgio entre as palavras. Transformamos os trechos que mudaram a sua vida em arte tipográfica de alto nível. Cartografamos mapas de mundos fantásticos com detalhes meticulosos e reinterpretamos capas de livros clássicos através de uma ótica contemporânea e abstrata. Vista a sua história e leve consigo o peso poético dos maiores autores da humanidade.\n\nSUGESTÕES DE ATELIER:\n• O mapa da sua fantasia épica favorita redesenhado.\n• Frases marcantes com tipografia vintage estruturada.\n• Elementos-chave da narrativa em estilo line-art.",
                 year: "LORE '26", tag: "LIVROS & CONTOS",
                 image: "https://images.unsplash.com/photo-1456615074700-1dc12aa7364d?q=80&w=2670&auto=format&fit=crop" 
             },
             {
                 title: "Acordes & Versos",
-                desc: "O ritmo que dita a sua vida. Capas de álbuns reimaginadas, trechos de músicas e elementos musicais desenhados com a estética minimalista e premium da SONIEN'S.",
+                desc: "Vista a frequência da sua alma. A coleção Acordes & Versos foge do óbvio das tradicionais 'camisetas de banda'. Pegamos no ritmo que dita a sua vida e traduzimo-lo num design vanguardista. Capas de álbuns históricos são desconstruídas em formas e sombras. Ondas sonoras das suas faixas favoritas ganham vida matemática na estampa. Letras de músicas tornam-se manifestos visuais com a estética premium e limpa que define o nosso atelier.\n\nSUGESTÕES DE ATELIER:\n• O espectro de áudio exato do refrão da sua música favorita.\n• Capas de álbuns icónicos em design abstrato.\n• Contornos de instrumentos em traço único contínuo.",
                 year: "AUDIO '26", tag: "MÚSICA & BANDAS",
                 image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=2670&auto=format&fit=crop" 
             },
             {
                 title: "Raízes & Elementos",
-                desc: "Conexão direta com a terra e o universo. Estampas orgânicas focadas em ilustrações botânicas, paisagens naturais, astronomia detalhada e a força do reino animal.",
+                desc: "Uma ode à imensidão do cosmos e à perfeição da terra. A coleção Raízes & Elementos é onde a ciência encontra a arte visual. Detalhamos constelações precisas, ciclos lunares e anatomia celeste com rigor científico e beleza imponente. Em contrapartida, exploramos a força do mundo natural com ilustrações de flora exótica, paisagens em pontilhismo e a dualidade fascinante da vida selvagem. Uma ligação profunda entre o micro e o macrocosmos.\n\nSUGESTÕES DE ATELIER:\n• O mapa astral exato do dia e local do seu nascimento.\n• Ilustrações botânicas vintage detalhadas a traço fino.\n• Animais de poder formados por geometria sagrada.",
                 year: "EARTH '26", tag: "NATUREZA & ASTRONOMIA",
                 image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=2674&auto=format&fit=crop" 
             },
             {
                 title: "Sua Arte Aqui",
-                desc: "A sua imaginação é o nosso limite. Você descreve a sua ideia (jogos, pets, artes abstratas, memes minimalistas) e o nosso atelier cria uma estampa 100% autoral e exclusiva para si.",
+                desc: "A colaboração máxima entre o cliente e o criador. Na linha Bespoke (Sob Medida), a tela em branco aguarda a sua visão e a sua imaginação dita os limites. Uma homenagem ao seu animal de estimação? Uma referência a um jogo que adora? O nosso atelier ouvirá a sua história e desenhará, a partir do zero, uma estampa 100% autoral, exclusiva e impossível de encontrar em outro lugar do mundo.\n\nO PROCESSO BESPOKE:\n1. Você descreve a sua visão e referências detalhadamente.\n2. O atelier cria opções exclusivas de design.\n3. A sua peça única ganha vida com qualidade impecável.",
                 year: "BESPOKE '26", tag: "PERSONALIZÁVEL",
                 image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=2671&auto=format&fit=crop" 
             }
         ];
 
         // --- FULL SOUND MANAGER ---
+        let lastTypingTime = 0; // OTIMIZAÇÃO: Throttle global para Web Audio API
+
         const SoundManager = {
             ctx: null, masterGain: null, ambientNodes: [],
             
@@ -765,7 +835,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                     const AC = window.AudioContext || window.webkitAudioContext;
                     this.ctx = new AC();
                     this.masterGain = this.ctx.createGain();
-                    // Aumentado o volume master significativamente (de 0.8 para 1.5)
                     this.masterGain.gain.value = 1.5; 
                     this.masterGain.connect(this.ctx.destination);
                 }
@@ -777,13 +846,13 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 try {
                     this.stopAmbient();
                     const osc1 = this.ctx.createOscillator();
-                    osc1.type = 'sine'; osc1.frequency.value = 45; 
-                    const gain1 = this.ctx.createGain(); gain1.gain.value = 0.25; // Aumentado
+                    osc1.type = 'sine'; osc1.frequency.value = 40; 
+                    const gain1 = this.ctx.createGain(); gain1.gain.value = 0.3; 
                     osc1.connect(gain1).connect(this.masterGain); osc1.start();
                     
                     const osc2 = this.ctx.createOscillator();
-                    osc2.type = 'triangle'; osc2.frequency.value = 48; 
-                    const gain2 = this.ctx.createGain(); gain2.gain.value = 0.12; // Aumentado
+                    osc2.type = 'sine'; osc2.frequency.value = 40.5; 
+                    const gain2 = this.ctx.createGain(); gain2.gain.value = 0.2; 
                     osc2.connect(gain2).connect(this.masterGain); osc2.start();
 
                     const bufferSize = this.ctx.sampleRate * 2;
@@ -794,11 +863,11 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                         const white = Math.random() * 2 - 1;
                         data[i] = (lastOut + (0.02 * white)) / 1.02;
                         lastOut = data[i];
-                        data[i] *= 2.5; 
+                        data[i] *= 2.0; 
                     }
                     const noise = this.ctx.createBufferSource(); noise.buffer = buffer; noise.loop = true;
-                    const noiseFilter = this.ctx.createBiquadFilter(); noiseFilter.type = 'lowpass'; noiseFilter.frequency.value = 300;
-                    const noiseGain = this.ctx.createGain(); noiseGain.gain.value = 0.08; // Aumentado
+                    const noiseFilter = this.ctx.createBiquadFilter(); noiseFilter.type = 'lowpass'; noiseFilter.frequency.value = 150; 
+                    const noiseGain = this.ctx.createGain(); noiseGain.gain.value = 0.1; 
                     noise.connect(noiseFilter).connect(noiseGain).connect(this.masterGain); noise.start();
                     this.ambientNodes.push(osc1, osc2, gain1, gain2, noise, noiseFilter, noiseGain);
                 } catch(e) {}
@@ -811,31 +880,53 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
 
             playTyping: function() {
                 if (!this.ctx) return;
-                const now = this.ctx.currentTime;
+                const now = Date.now();
+                // OTIMIZAÇÃO: Impede que o áudio seja tocado milhares de vezes no mesmo frame, causando lag/cortes
+                if (now - lastTypingTime < 40) return; 
+                lastTypingTime = now;
+
+                const t = this.ctx.currentTime;
                 const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
-                osc.frequency.setValueAtTime(150 + Math.random() * 50, now); osc.type = 'sine'; 
-                // Aumentado ganho de digitação
-                gain.gain.setValueAtTime(0.06, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03); 
-                osc.connect(gain).connect(this.masterGain); osc.start(); osc.stop(now + 0.03);
+                osc.frequency.setValueAtTime(3000 + Math.random() * 500, t); osc.type = 'triangle'; 
+                gain.gain.setValueAtTime(0.02, t); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.02); 
+                osc.connect(gain).connect(this.masterGain); osc.start(t); osc.stop(t + 0.03);
             },
 
             playHover: function() {
                 if(!this.ctx) return;
-                const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
-                osc.frequency.setValueAtTime(200, this.ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(220, this.ctx.currentTime + 0.1);
-                // Aumentado zumbido de hover
-                gain.gain.setValueAtTime(0.08, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.1);
-                osc.connect(gain).connect(this.masterGain); osc.start(); osc.stop(this.ctx.currentTime + 0.1);
+                const t = this.ctx.currentTime;
+                const bufferSize = this.ctx.sampleRate * 0.1;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+                
+                const noise = this.ctx.createBufferSource(); noise.buffer = buffer;
+                const filter = this.ctx.createBiquadFilter(); filter.type = 'bandpass'; filter.Q.value = 1.0;
+                filter.frequency.setValueAtTime(2000, t);
+                filter.frequency.exponentialRampToValueAtTime(4000, t + 0.1);
+                
+                const gain = this.ctx.createGain();
+                gain.gain.setValueAtTime(0.05, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+                
+                noise.connect(filter).connect(gain).connect(this.masterGain);
+                noise.start(t);
             },
 
             playClick: function() {
                 if(!this.ctx) return;
-                const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
-                osc.type = 'sine'; osc.frequency.setValueAtTime(120, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.1);
-                // Aumentado o impacto do clique
-                gain.gain.setValueAtTime(0.3, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.1);
-                osc.connect(gain).connect(this.masterGain); osc.start(); osc.stop(this.ctx.currentTime + 0.1);
+                const t = this.ctx.currentTime;
+                
+                const osc1 = this.ctx.createOscillator(); osc1.type = 'sine'; osc1.frequency.setValueAtTime(800, t);
+                const osc2 = this.ctx.createOscillator(); osc2.type = 'sine'; osc2.frequency.setValueAtTime(1200, t);
+                
+                const gain = this.ctx.createGain();
+                gain.gain.setValueAtTime(0.15, t);
+                gain.gain.setTargetAtTime(0.05, t + 0.05, 0.1); 
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.6); 
+                
+                osc1.connect(gain); osc2.connect(gain); gain.connect(this.masterGain);
+                osc1.start(t); osc2.start(t); osc1.stop(t+0.7); osc2.stop(t+0.7);
             },
 
             playWarp: function() {
@@ -845,44 +936,76 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 const data = buffer.getChannelData(0);
                 for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
                 const noise = this.ctx.createBufferSource(); noise.buffer = buffer;
-                const filter = this.ctx.createBiquadFilter(); filter.type = 'bandpass'; filter.Q.value = 0.5;
-                filter.frequency.setValueAtTime(150, this.ctx.currentTime);
-                filter.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.3); 
-                filter.frequency.exponentialRampToValueAtTime(150, this.ctx.currentTime + 0.6); 
+                
+                const filter = this.ctx.createBiquadFilter(); filter.type = 'lowpass'; filter.Q.value = 0.5;
+                filter.frequency.setValueAtTime(100, this.ctx.currentTime);
+                filter.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.4); 
+                filter.frequency.exponentialRampToValueAtTime(100, this.ctx.currentTime + 0.8); 
+                
                 const gain = this.ctx.createGain(); gain.gain.setValueAtTime(0, this.ctx.currentTime);
-                // Aumentado o deslizar de seda (Scroll)
-                gain.gain.linearRampToValueAtTime(0.15, this.ctx.currentTime + 0.3);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.6);
+                gain.gain.linearRampToValueAtTime(0.15, this.ctx.currentTime + 0.4);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.8);
+                
                 noise.connect(filter).connect(gain).connect(this.masterGain); noise.start();
             },
 
             playSupernova: function() {
                 if (!this.ctx) return;
                 const t = this.ctx.currentTime;
-                const osc = this.ctx.createOscillator(); const oscGain = this.ctx.createGain();
-                osc.type = 'sine'; osc.frequency.setValueAtTime(100, t); osc.frequency.exponentialRampToValueAtTime(150, t + 2.0); 
-                // Aumentado o acorde inicial
-                oscGain.gain.setValueAtTime(0, t); oscGain.gain.linearRampToValueAtTime(0.4, t + 0.5); oscGain.gain.exponentialRampToValueAtTime(0.001, t + 3.0); 
-                osc.connect(oscGain).connect(this.masterGain); osc.start(t); osc.stop(t + 3.5);
+                const masterSupernovaGain = this.ctx.createGain();
+                
+                masterSupernovaGain.gain.setValueAtTime(0, t);
+                masterSupernovaGain.gain.linearRampToValueAtTime(0.3, t + 1.0);
+                masterSupernovaGain.gain.exponentialRampToValueAtTime(0.001, t + 4.0);
+                masterSupernovaGain.connect(this.masterGain);
+
+                const freqs = [65.41, 164.81, 196.00, 246.94, 293.66];
+                freqs.forEach(f => {
+                    const osc = this.ctx.createOscillator(); osc.type = 'sine';
+                    osc.frequency.setValueAtTime(f, t);
+                    osc.connect(masterSupernovaGain);
+                    osc.start(t); osc.stop(t + 4.5);
+                });
             },
 
             playTick: function() {
                 if(!this.ctx) return;
-                const osc = this.ctx.createOscillator();
+                const osc = this.ctx.createOscillator(); osc.type = 'triangle';
                 const gain = this.ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.03);
-                // Aumentado o Tick do carrossel
-                gain.gain.setValueAtTime(0.06, this.ctx.currentTime); 
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.03);
+                
+                osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, this.ctx.currentTime + 0.02);
+                
+                gain.gain.setValueAtTime(0.1, this.ctx.currentTime); 
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.02);
+                
                 osc.connect(gain).connect(this.masterGain);
                 osc.start();
                 osc.stop(this.ctx.currentTime + 0.03);
             }
         };
 
-        // --- SOLAR REVEAL ---
+        // --- LIQUID DISTORTION ANIMATION ---
+        let liquidAnimReq;
+        function pulseLiquid() {
+            const map = document.getElementById('liquid-map');
+            if(!map) return;
+            let scale = 40; 
+            cancelAnimationFrame(liquidAnimReq); // OTIMIZAÇÃO: usa rAF ao invés de setInterval pesado
+            
+            function animateLiquid() {
+                scale *= 0.88;
+                map.setAttribute('scale', scale);
+                if (scale >= 0.5) {
+                    liquidAnimReq = requestAnimationFrame(animateLiquid);
+                } else {
+                    map.setAttribute('scale', 0);
+                }
+            }
+            animateLiquid();
+        }
+
+        // --- SOLAR REVEAL (OTIMIZADO) ---
         const glyphs = "█▓▒░<>/"; 
         function solarReveal(element) {
             const originalText = element.dataset.value || element.innerText;
@@ -905,10 +1028,14 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 return span;
             });
 
-            let frame = 0;
-            const interval = setInterval(() => {
-                frame++;
-                if(Math.random() > 0.8) SoundManager.playTyping(); 
+            let startTimestamp;
+            // OTIMIZAÇÃO: requestAnimationFrame no lugar de setInterval poupa a CPU e garante 60fps lisos
+            function step(timestamp) {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = timestamp - startTimestamp;
+                const frame = progress / 40; // Equivalente aos 40ms do setInterval anterior
+                
+                if (Math.random() > 0.8) SoundManager.playTyping();
                 
                 spans.forEach((span, i) => {
                     if(!span) return;
@@ -925,15 +1052,19 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                         }
                     }
                 });
-                if(frame > 50) clearInterval(interval);
-            }, 40);
+
+                if (frame <= 50) {
+                    requestAnimationFrame(step);
+                }
+            }
+            requestAnimationFrame(step);
         }
 
         // --- THREE.JS ---
         function initThreeJS() {
             const canvas = document.getElementById('webgl-canvas');
             const scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x0d0c0b, 0.0015); // Cor do fog atualizada para o fundo escuro
+            scene.fog = new THREE.FogExp2(0x0d0c0b, 0.0015); 
 
             const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 6000); 
             
@@ -948,7 +1079,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             const randomArray = new Float32Array(particlesCount);
             const colorArray = new Float32Array(particlesCount * 3);
             
-            // Cores baseadas na paleta da SONIEN'S: Creme e Dourado
             const color1 = new THREE.Color(0xf5eedc);
             const color2 = new THREE.Color(0xd4af37);
 
@@ -984,7 +1114,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             document.addEventListener('mousemove', e => {
                 mouseX = (e.clientX - window.innerWidth/2);
                 mouseY = (e.clientY - window.innerHeight/2);
-            });
+            }, { passive: true });
 
             const clock = new THREE.Clock();
 
@@ -992,7 +1122,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 const time = clock.getElapsedTime();
                 const positions = geometry.attributes.position.array;
                 
-                scrollZ += (targetScrollZ - scrollZ) * 0.05;
+                scrollZ += (targetScrollZ - scrollZ) * 0.035;
                 camera.position.z = -scrollZ;
                 
                 camera.position.x += (mouseX * 0.05 - camera.position.x) * 0.05;
@@ -1008,11 +1138,12 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 const winH = window.innerHeight || 1;
                 const forceX = (mouseX / winW) * 70; 
                 const forceY = -(mouseY / winH) * 70;
+                const camZ = camera.position.z; // OTIMIZAÇÃO: Cache da variável de câmara para fora do loop
 
                 for(let i=0; i<particlesCount; i++) {
                     const i3 = i*3;
                     let z = positions[i3+2];
-                    const relativeZ = z - camera.position.z;
+                    const relativeZ = z - camZ;
                     
                     if (relativeZ > 1000) {
                         positions[i3+2] -= tunnelLength; 
@@ -1020,7 +1151,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                         positions[i3+2] += tunnelLength;
                     }
 
-                    // Movimento mais ondulado, luxuoso
+                    // OTIMIZAÇÃO: Removidos checks isNaN desnecessários do loop (eles matavam a CPU)
                     const driftX = Math.sin(time * 0.8 + randomArray[i] * 10) * 4;
                     const driftY = Math.cos(time * 0.6 + randomArray[i] * 10) * 4;
                     const distFactor = 1 + (randomArray[i] * 0.5);
@@ -1028,14 +1159,21 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                     let targetX = originalPosArray[i3] - (forceX * distFactor) + driftX;
                     let targetY = originalPosArray[i3+1] - (forceY * distFactor) + driftY;
 
-                    if (!isNaN(targetX) && !isNaN(targetY)) {
-                        positions[i3] += (targetX - positions[i3]) * 0.1;
-                        positions[i3+1] += (targetY - positions[i3+1]) * 0.1;
-                    }
+                    positions[i3] += (targetX - positions[i3]) * 0.1;
+                    positions[i3+1] += (targetY - positions[i3+1]) * 0.1;
                 }
                 geometry.attributes.position.needsUpdate = true;
                 
-                particlesMeshGlobal.rotation.z = time * 0.01; // Giro mais lento e elegante
+                particlesMeshGlobal.rotation.z = time * 0.01; 
+
+                const activeZ = Math.round(scrollZ / 1000) * 1000;
+                document.querySelectorAll('.dot-inner').forEach(dot => {
+                    if (parseInt(dot.dataset.z) === activeZ) {
+                        dot.classList.add('active');
+                    } else {
+                        dot.classList.remove('active');
+                    }
+                });
 
                 updateHTMLSections();
                 updateCarousel3D();
@@ -1056,7 +1194,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             });
         }
 
-        // --- DUAL CURSOR LOGIC ---
+        // --- DUAL CURSOR LOGIC (OTIMIZADO) ---
         let cursorX = window.innerWidth / 2, cursorY = window.innerHeight / 2;
         let trailX = cursorX, trailY = cursorY;
         let isHovering = false;
@@ -1066,17 +1204,15 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             const trail = document.querySelector('.cursor-trail');
             
             if(window.matchMedia("(pointer: fine)").matches) {
+                // Passado para evento passive para não bloquear o frame do navegador
                 document.addEventListener('mousemove', e => {
                     cursorX = e.clientX;
                     cursorY = e.clientY;
-                    dot.style.left = cursorX + 'px';
-                    dot.style.top = cursorY + 'px';
-                });
+                }, { passive: true });
                 
                 document.addEventListener('mouseover', e => {
                     if(e.target.closest('.hover-trigger')) {
                         isHovering = true;
-                        dot.style.transform = "translate(-50%, -50%) scale(0)";
                         trail.style.width = "60px";
                         trail.style.height = "60px";
                         trail.style.backgroundColor = "rgba(212, 175, 55, 0.15)";
@@ -1084,25 +1220,26 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                         SoundManager.playHover();
                     } else {
                         isHovering = false;
-                        dot.style.transform = "translate(-50%, -50%) scale(1)";
                         trail.style.width = "var(--cursor-trail-size)";
                         trail.style.height = "var(--cursor-trail-size)";
                         trail.style.backgroundColor = "transparent";
                         trail.style.borderColor = "rgba(245, 238, 220, 0.5)";
                     }
-                });
+                }, { passive: true });
             }
         }
 
         function updateDualCursor() {
             if(!window.matchMedia("(pointer: fine)").matches) return;
+            const dot = document.querySelector('.cursor-dot');
             const trail = document.querySelector('.cursor-trail');
             
             trailX += (cursorX - trailX) * 0.15;
             trailY += (cursorY - trailY) * 0.15;
             
-            trail.style.left = trailX + 'px';
-            trail.style.top = trailY + 'px';
+            // OTIMIZAÇÃO: Ao invés de mudar `left` e `top` (que causa Reflows destrutivos), usamos translate3d do GPU
+            dot.style.transform = `translate3d(calc(${cursorX}px - 50%), calc(${cursorY}px - 50%), 0) scale(${isHovering ? 0 : 1})`;
+            trail.style.transform = `translate3d(calc(${trailX}px - 50%), calc(${trailY}px - 50%), 0)`;
         }
 
         // --- MAGNETIC BUTTONS LOGIC ---
@@ -1137,7 +1274,10 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
 
             projects.forEach((proj, i) => {
                 const el = document.createElement('div');
-                el.className = 'project-card-3d';
+                el.className = 'project-card-3d hover-trigger'; 
+                el.tabIndex = 0; 
+                el.setAttribute('role', 'button');
+                el.setAttribute('aria-label', 'Ver detalhes da coleção ' + proj.title);
                 el.style.transform = `rotateY(${i * angleStep}deg) translateZ(${radius}px)`;
                 
                 el.innerHTML = `
@@ -1148,51 +1288,64 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                         <div class="flex justify-between items-end mt-4 mb-3 w-full">
                             <div class="flex-1 min-w-0 pr-4">
                                 <span class="text-[9px] font-mono text-[#d4af37] tracking-wider block mb-1 truncate">${proj.tag}</span>
-                                <!-- Adicionada classe card-solar-text -->
                                 <h3 class="text-2xl font-display italic text-white truncate solar-text card-solar-text" data-value="${proj.title}">${proj.title}</h3>
                             </div>
                             <span class="text-[9px] font-mono text-gray-500 flex-shrink-0">${proj.year}</span>
                         </div>
                         <div class="w-full relative flex-1 min-h-0">
-                        <!-- Adicionada classe card-solar-text -->
                         <p class="text-[11px] text-gray-400 font-light leading-relaxed break-words whitespace-normal line-clamp-4 solar-text card-solar-text" data-value="${proj.desc}">
                             ${proj.desc}
                         </p>
                     </div>
                 </div>
             `;
-            el.onclick = (e) => {
+            
+            el.addEventListener('mouseenter', () => {
+                if(introCompleted && !isDraggingCarousel) pulseLiquid();
+            }, { passive: true });
+            
+            const openProject = (e) => {
                 if (!introCompleted) return;
                 
                 if (dragDistanceCarousel > 5) {
-                    e.preventDefault(); e.stopPropagation(); return;
+                    if(e.type === 'click') { e.preventDefault(); e.stopPropagation(); return; }
                 }
                 SoundManager.playClick();
                 
-                // Preencher a Página Dedicada
                 document.getElementById('page-title').innerText = proj.title;
+                document.getElementById('page-title').dataset.value = proj.title;
+                
                 document.getElementById('page-desc').innerText = proj.desc;
+                document.getElementById('page-desc').dataset.value = proj.desc;
+                
                 document.getElementById('page-tag').innerText = proj.tag;
+                document.getElementById('page-tag').dataset.value = proj.tag;
+                
                 document.getElementById('page-image').src = proj.image;
                 
-                // Limpar formulário ao abrir nova página
                 document.getElementById('dp-size').value = "";
                 document.getElementById('dp-color').value = "";
                 document.getElementById('dp-msg').value = "";
                 
-                // Mostrar a Página Dedicada e bloquear scroll principal
                 isDedicatedPageOpen = true; 
                 const page = document.getElementById('dedicated-page');
                 page.style.display = 'block';
-                // Forçar reflow para a transição funcionar
+                page.setAttribute('aria-hidden', 'false');
                 void page.offsetWidth;
                 page.classList.remove('hidden');
                 page.style.opacity = 1;
                 page.style.pointerEvents = 'auto';
                 
-                // Efeitos no texto da página dedicada
-                setTimeout(() => solarReveal(document.getElementById('page-title')), 300);
+                setTimeout(() => {
+                    solarReveal(document.getElementById('page-title'));
+                    solarReveal(document.getElementById('page-tag'));
+                    solarReveal(document.getElementById('page-desc'));
+                }, 300);
             };
+
+            el.onclick = openProject;
+            el.onkeydown = (e) => { if(e.key === 'Enter') openProject(e); };
+
             stage.appendChild(el);
         });
     }
@@ -1205,13 +1358,26 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
     let autoRotateTimeout = null;
     let dragDistanceCarousel = 0;
     let lastTickRot = 0; 
+    let carouselVelocity = 0; 
 
     function updateCarousel3D() {
         const stage = document.getElementById('carousel-stage');
         if(!stage) return;
         
-        if (autoRotateCarousel && !stage.matches(':hover') && !isDraggingCarousel) {
-            targetCarouselRot += 0.08; // Rotação ligeiramente mais suave
+        if (!isDraggingCarousel) {
+            if (Math.abs(carouselVelocity) > 0.5) {
+                targetCarouselRot -= carouselVelocity;
+                carouselVelocity *= 0.94; 
+            } else {
+                carouselVelocity = 0;
+                if (!autoRotateCarousel) {
+                    const angleStep = 360 / projects.length;
+                    let closestSnap = Math.round(targetCarouselRot / angleStep) * angleStep;
+                    targetCarouselRot += (closestSnap - targetCarouselRot) * 0.05; 
+                } else if (!stage.matches(':hover')) {
+                    targetCarouselRot += 0.08; 
+                }
+            }
         }
 
         const delta = (targetCarouselRot - carouselRot) * 0.08;
@@ -1225,18 +1391,14 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             lastTickRot = carouselRot;
         }
 
-        // --- Lógica de Revelação do Card Ativo (Apenas o que está de frente) ---
         const workSection = document.getElementById('work');
         if (workSection && workSection.classList.contains('active-section')) {
             const angleStep = 360 / projects.length;
-            // Garantir que a rotação normalized seja sempre positiva (0 a 360)
             let normalizedRot = ((carouselRot % 360) + 360) % 360; 
             
-            // O index do card que está na frente (Ponto 0)
             let activeIndex = Math.round(normalizedRot / angleStep) % projects.length;
             
             const cards = document.querySelectorAll('.project-card-3d');
-            // Se o card de frente ainda não foi animado, animamos apenas ele
             if (cards[activeIndex] && cards[activeIndex].dataset.revealed !== 'true') {
                 cards[activeIndex].querySelectorAll('.card-solar-text').forEach(solarReveal);
                 cards[activeIndex].dataset.revealed = 'true';
@@ -1262,6 +1424,9 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             
             const x = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
             const walk = (x - startXCarousel) * 0.8; 
+            
+            carouselVelocity = walk * 0.6; 
+            
             targetCarouselRot -= walk; 
             startXCarousel = x;
             dragDistanceCarousel += Math.abs(walk);
@@ -1274,7 +1439,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         };
 
         carouselWrapper.addEventListener('mousedown', startDrag);
-        window.addEventListener('mousemove', moveDrag);
+        window.addEventListener('mousemove', moveDrag, {passive: true});
         window.addEventListener('mouseup', endDrag);
 
         carouselWrapper.addEventListener('touchstart', startDrag, {passive: true});
@@ -1282,7 +1447,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         window.addEventListener('touchend', endDrag);
     }
 
-    // Variável Global para o Timeout de Revelação
     const revealTimeouts = {};
 
     // --- Z-SCROLL & HTML SECTIONS OTIMIZADOS ---
@@ -1290,7 +1454,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             if(!introCompleted) return;
             const sections = document.querySelectorAll('.section-3d');
             
-            // OTIMIZAÇÃO: Deteta se é um scroll de salto rápido (ex: click no logo)
             const isJumping = Math.abs(targetScrollZ - scrollZ) > 800;
 
             sections.forEach(sec => {
@@ -1298,8 +1461,8 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 const dist = z - scrollZ;
                 
                 if(dist > -800 && dist < 1200) {
-                    // OTIMIZAÇÃO: visibility invés de display:none poupa milhares de cálculos de Reflow
-                    sec.style.visibility = 'visible'; 
+                    // OTIMIZAÇÃO: Bloqueia reflows aplicando valores diretos sem instanciar style dezenas de vezes desnecessariamente
+                    if(sec.style.visibility !== 'visible') sec.style.visibility = 'visible'; 
                     
                     let opacity = 0, blur = 0, scale = 1;
                     
@@ -1307,7 +1470,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                         const progress = 1 - (dist / 1200);
                         opacity = Math.pow(progress, 3); 
                         scale = 0.8 + (0.2 * progress);
-                        // Corta o desfoque completamente em velocidade alta
                         blur = isJumping ? 0 : (1-progress) * 10; 
                     } else {
                         const progress = Math.abs(dist) / 800;
@@ -1316,11 +1478,9 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                         blur = isJumping ? 0 : progress * 20;
                     }
                     
-                    // OTIMIZAÇÃO: toFixed(3) evita alocação pesada de memória nas strings dinâmicas
                     sec.style.opacity = opacity.toFixed(3);
                     sec.style.transform = `scale(${scale.toFixed(3)})`;
                     
-                    // OTIMIZAÇÃO: Não ativa o filtro a menos que seja notável visualmente (> 0.5px) e não seja em alta velocidade
                     if (blur > 0.5 && !isJumping) {
                         sec.style.filter = `blur(${blur.toFixed(1)}px)`;
                     } else {
@@ -1328,18 +1488,14 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                     }
                     
                     if(opacity > 0.5) {
-                        sec.classList.add('active-section');
+                        if (!sec.classList.contains('active-section')) sec.classList.add('active-section');
                         if(sec.dataset.revealed !== 'true') {
-                            
-                            // OTIMIZAÇÃO: Debounce - Só decodifica se ficar parado 250ms (ignora no voo rápido)
                             if (!revealTimeouts[z]) {
                                 revealTimeouts[z] = setTimeout(() => {
                                     if (sec.classList.contains('active-section')) {
-                                        // Executa as animações de todos os textos, EXCETO os do card do carrossel
                                         sec.querySelectorAll('.solar-text:not(.card-solar-text)').forEach(solarReveal);
                                         sec.dataset.revealed = 'true';
                                         
-                                        // Permite que os cards voltem a ser animados quando saimos e entramos na secção novamente
                                         if (sec.id === 'work') {
                                             sec.querySelectorAll('.project-card-3d').forEach(c => c.dataset.revealed = 'false');
                                         }
@@ -1349,18 +1505,20 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                             }
                         }
                     } else {
-                        sec.classList.remove('active-section');
+                        if (sec.classList.contains('active-section')) sec.classList.remove('active-section');
                         if (revealTimeouts[z]) {
                             clearTimeout(revealTimeouts[z]);
                             revealTimeouts[z] = null;
                         }
                     }
                 } else {
-                    sec.style.visibility = 'hidden';
-                    sec.style.opacity = '0';
-                    sec.style.filter = 'none';
-                    sec.dataset.revealed = 'false';
-                    sec.classList.remove('active-section');
+                    if (sec.style.visibility !== 'hidden') {
+                        sec.style.visibility = 'hidden';
+                        sec.style.opacity = '0';
+                        sec.style.filter = 'none';
+                        sec.dataset.revealed = 'false';
+                        sec.classList.remove('active-section');
+                    }
                     if (revealTimeouts[z]) {
                         clearTimeout(revealTimeouts[z]);
                         revealTimeouts[z] = null;
@@ -1372,7 +1530,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         // --- INPUT HANDLING ---
         function initScroll() {
             window.addEventListener('wheel', e => {
-                if(!introCompleted || isDedicatedPageOpen) return; // Bloqueia o scroll se a página estiver aberta
+                if(!introCompleted || isDedicatedPageOpen) return; 
                 const now = Date.now();
                 if (now - lastScrollTime < scrollCooldown) return;
                 if (Math.abs(e.deltaY) < 30) return;
@@ -1387,8 +1545,29 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             }, { passive: true });
 
             window.addEventListener('keydown', e => {
-                if(!introCompleted || isDedicatedPageOpen) return; // Bloqueia as setas do teclado
+                if(!introCompleted || isDedicatedPageOpen) return; 
                 const now = Date.now();
+                
+                const workSec = document.getElementById('work');
+                if(workSec && workSec.classList.contains('active-section')) {
+                    if (e.key === 'ArrowRight') {
+                        targetCarouselRot += (360 / projects.length);
+                        SoundManager.playTick();
+                        autoRotateCarousel = false;
+                        clearTimeout(autoRotateTimeout);
+                        autoRotateTimeout = setTimeout(() => { autoRotateCarousel = true; }, 4000);
+                        return; 
+                    }
+                    if (e.key === 'ArrowLeft') {
+                        targetCarouselRot -= (360 / projects.length);
+                        SoundManager.playTick();
+                        autoRotateCarousel = false;
+                        clearTimeout(autoRotateTimeout);
+                        autoRotateTimeout = setTimeout(() => { autoRotateCarousel = true; }, 4000);
+                        return; 
+                    }
+                }
+
                 if (now - lastScrollTime < scrollCooldown) return; 
 
                 if(e.key === 'ArrowDown') { 
@@ -1403,12 +1582,12 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                         lastScrollTime = now; SoundManager.playWarp(); 
                     } 
                 }
-            });
+            }, { passive: true });
 
             let touchStartY = 0;
             window.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, {passive: true});
             window.addEventListener('touchend', e => {
-                if(!introCompleted || isDedicatedPageOpen) return; // Bloqueia o swipe em mobile
+                if(!introCompleted || isDedicatedPageOpen) return; 
                 const now = Date.now();
                 if (now - lastScrollTime < scrollCooldown) return;
 
@@ -1424,7 +1603,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                         lastScrollTime = now; SoundManager.playWarp();
                     }
                 }
-            });
+            }, { passive: true });
             
             document.addEventListener('mousemove', (e) => {
                 if (window.innerWidth < 768) return;
@@ -1438,7 +1617,18 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                     leftImg.style.transform = `perspective(1000px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg) translateZ(25px)`;
                     rightImg.style.transform = `perspective(1000px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg) translateZ(25px)`;
                 }
-            });
+
+                document.querySelectorAll('.card-image-container img').forEach(img => {
+                    img.style.setProperty('--px', `${-x * 12}px`);
+                    img.style.setProperty('--py', `${-y * 12}px`);
+                });
+
+                const heroTitle = document.querySelector('.hero-shine-text');
+                if (heroTitle) {
+                    heroTitle.style.transform = `translate(${x * 15}px, ${y * 15}px)`;
+                    heroTitle.style.transition = 'none'; 
+                }
+            }, { passive: true });
         }
 
         window.scrollToSection = (z) => {
@@ -1580,16 +1770,16 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 const page = document.getElementById('dedicated-page');
                 page.style.opacity = 0;
                 page.style.pointerEvents = 'none';
+                page.setAttribute('aria-hidden', 'true');
                 setTimeout(() => {
                     page.style.display = 'none';
                     page.classList.add('hidden');
                 }, 700);
             });
 
-            // WHATSAPP SUBMIT (Página Dedicada - Estampas)
-            document.getElementById('dp-submit').addEventListener('click', () => {
+            // WHATSAPP SUBMIT (Página Dedicada - Estampas) - OTIMIZADO PARA BACKGROUND
+            document.getElementById('dp-submit').addEventListener('click', function() {
                 SoundManager.playClick();
-                if(SoundManager.playSupernova) SoundManager.playSupernova();
 
                 const collection = document.getElementById('page-title').innerText;
                 const name = document.getElementById('dp-name').value || "Cliente VIP";
@@ -1602,84 +1792,125 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                     return;
                 }
 
-                isDedicatedPageOpen = false; // Liberta o scroll após submissão
+                // UX Imersiva: Feedback visual de processamento no próprio botão
+                this.innerText = "A TRANSMITIR...";
+                this.style.backgroundColor = "#fff";
+                this.style.color = "#000";
 
-                // Flash Effect
-                const flash = document.getElementById('flash-overlay');
-                if (flash) {
-                    flash.style.display = 'block'; void flash.offsetWidth;
-                    flash.style.transition = 'opacity 0.05s ease-out'; flash.style.opacity = 1;
-                }
+                if(SoundManager.playSupernova) SoundManager.playSupernova();
 
-                const page = document.getElementById('dedicated-page');
-                page.style.opacity = 0;
-                
+                // Simulação de chamada API em Background (Sem sair da página)
                 setTimeout(() => {
-                    if(flash) { flash.style.transition = "opacity 1.0s ease-in-out"; flash.style.opacity = 0; }
-                }, 100);
+                    this.innerText = "PEDIDO ENVIADO ✓";
+                    document.getElementById('hud-status').innerText = "TRANSMISSÃO CONCLUÍDA";
+                    document.getElementById('hud-status').style.color = "var(--accent)";
 
-                setTimeout(() => {
-                    page.style.display = 'none';
-                    page.classList.add('hidden');
-                    if(flash) flash.style.display = 'none';
+                    setTimeout(() => {
+                        isDedicatedPageOpen = false; // Liberta o scroll após submissão
 
-                    const phone = "5532988212111"; 
-                    const text = `Olá SONIEN'S! Sou ${name}.\n\nGostaria de encomendar uma camiseta da linha *${collection}*.\n\n*Detalhes do Pedido:*\n- Tamanho: ${size}\n- Cor Base: ${color}\n\n*Minha Ideia:* \n${msg}`;
-                    const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
-                    window.open(url, '_blank');
+                        // Flash Effect
+                        const flash = document.getElementById('flash-overlay');
+                        if (flash) {
+                            flash.style.display = 'block'; void flash.offsetWidth;
+                            flash.style.transition = 'opacity 0.05s ease-out'; flash.style.opacity = 1;
+                        }
 
-                }, 1500); 
+                        const page = document.getElementById('dedicated-page');
+                        page.style.opacity = 0;
+                        
+                        setTimeout(() => {
+                            if(flash) { flash.style.transition = "opacity 1.0s ease-in-out"; flash.style.opacity = 0; }
+                        }, 100);
+
+                        setTimeout(() => {
+                            page.style.display = 'none';
+                            page.classList.add('hidden');
+                            page.setAttribute('aria-hidden', 'true');
+                            if(flash) flash.style.display = 'none';
+
+                            // Restaurar os estados para a próxima vez
+                            this.innerText = "Solicitar Criação";
+                            this.style.backgroundColor = "";
+                            this.style.color = "";
+                            document.getElementById('hud-status').innerText = "INATIVO";
+                            document.getElementById('hud-status').style.color = "";
+
+                        }, 1500); 
+                    }, 1200); // Tempo de leitura da confirmação
+                }, 1500); // Tempo de simulação de rede
             });
 
-            // WHATSAPP SUBMIT (Formulário Geral / Contato)
-            document.getElementById('submit-whatsapp').addEventListener('click', () => {
+            // WHATSAPP SUBMIT (Formulário Geral / Contato) - OTIMIZADO PARA BACKGROUND
+            document.getElementById('submit-whatsapp').addEventListener('click', function() {
                 SoundManager.playClick();
-                if(SoundManager.playSupernova) SoundManager.playSupernova();
 
                 const name = document.getElementById('form-name').value || "Cliente VIP";
                 const email = document.getElementById('form-email').value || "Não informado";
                 const msg = document.getElementById('form-msg').value || "Desejo agendar uma prova no atelier.";
 
-                const flash = document.getElementById('flash-overlay');
-                if (flash) {
-                    flash.style.display = 'block'; void flash.offsetWidth;
-                    flash.style.transition = 'opacity 0.05s ease-out'; flash.style.opacity = 1;
-                }
+                // UX Imersiva: Feedback visual de processamento no próprio botão
+                this.innerText = "A TRANSMITIR...";
+                this.style.backgroundColor = "#fff";
+                this.style.color = "#000";
 
-                document.getElementById('contact-modal').classList.remove('open');
-                
-                const viewport = document.getElementById('viewport'); if(viewport) viewport.style.opacity = '0';
-                const nav = document.getElementById('main-nav'); if(nav) nav.style.opacity = '0';
-                const footer = document.getElementById('footer-section'); if(footer) footer.style.opacity = '0';
+                if(SoundManager.playSupernova) SoundManager.playSupernova();
 
+                // Simulação de chamada API em Background (Sem sair da página)
                 setTimeout(() => {
-                    if(flash) { flash.style.transition = "opacity 1.0s ease-in-out"; flash.style.opacity = 0; }
-                }, 100);
+                    this.innerText = "AGENDAMENTO SOLICITADO ✓";
+                    document.getElementById('hud-status').innerText = "TRANSMISSÃO CONCLUÍDA";
+                    document.getElementById('hud-status').style.color = "var(--accent)";
 
-                setTimeout(() => {
-                    window.scrollToSection(0);
-                    if(viewport) viewport.style.opacity = '1';
-                    if(nav) nav.style.opacity = '1';
-                    if(footer) footer.style.opacity = '1';
-                    if(flash) flash.style.display = 'none';
+                    setTimeout(() => {
+                        const flash = document.getElementById('flash-overlay');
+                        if (flash) {
+                            flash.style.display = 'block'; void flash.offsetWidth;
+                            flash.style.transition = 'opacity 0.05s ease-out'; flash.style.opacity = 1;
+                        }
 
-                    const navLinks = document.getElementById('nav-links');
-                    const navCta = document.getElementById('nav-cta');
-                    if(navLinks) {
-                        navLinks.classList.remove('opacity-0', 'pointer-events-none');
-                        navLinks.querySelectorAll('.solar-text').forEach(solarReveal);
-                    }
-                    if(navCta) {
-                        navCta.classList.remove('opacity-0', 'pointer-events-none');
-                        solarReveal(navCta);
-                    }
+                        document.getElementById('contact-modal').classList.remove('open');
+                        
+                        const viewport = document.getElementById('viewport'); if(viewport) viewport.style.opacity = '0';
+                        const nav = document.getElementById('main-nav'); if(nav) nav.style.opacity = '0';
+                        const footer = document.getElementById('footer-section'); if(footer) footer.style.opacity = '0';
+                        const hudNav = document.getElementById('hud-nav'); if(hudNav) hudNav.style.opacity = '0';
 
-                    const phone = "5532988212111"; 
-                    const text = `Olá SONIEN'S! Sou ${name} (${email}).\n\n${msg}`;
-                    const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
-                    window.open(url, '_blank');
+                        setTimeout(() => {
+                            if(flash) { flash.style.transition = "opacity 1.0s ease-in-out"; flash.style.opacity = 0; }
+                        }, 100);
 
-                }, 1500); 
+                        setTimeout(() => {
+                            window.scrollToSection(0);
+                            if(viewport) viewport.style.opacity = '1';
+                            if(nav) nav.style.opacity = '1';
+                            if(footer) footer.style.opacity = '1';
+                            if(hudNav) {
+                                hudNav.style.opacity = '1';
+                                hudNav.classList.remove('opacity-0', 'pointer-events-none');
+                            }
+                            if(flash) flash.style.display = 'none';
+
+                            const navLinks = document.getElementById('nav-links');
+                            const navCta = document.getElementById('nav-cta');
+                            if(navLinks) {
+                                navLinks.classList.remove('opacity-0', 'pointer-events-none');
+                                navLinks.querySelectorAll('.solar-text').forEach(solarReveal);
+                            }
+                            if(navCta) {
+                                navCta.classList.remove('opacity-0', 'pointer-events-none');
+                                solarReveal(navCta);
+                            }
+
+                            // Restaurar os estados para a próxima vez
+                            this.innerText = "Solicitar Agendamento";
+                            this.style.backgroundColor = "";
+                            this.style.color = "";
+                            document.getElementById('hud-status').innerText = "INATIVO";
+                            document.getElementById('hud-status').style.color = "";
+
+                        }, 1500); 
+                    }, 1200); // Tempo de leitura da confirmação
+                }, 1500); // Tempo de simulação de rede
             });
         });
     </script>
