@@ -34,13 +34,9 @@
             --accent: #d4af37; 
             --bg-color: #0d0c0b; 
             --glass-border: rgba(245, 238, 220, 0.15);
+            /* Variáveis dinâmicas para o Mouse Parallax Otimizado na GPU */
             --mx: 0; 
             --my: 0;
-        }
-
-        /* OTIMIZAÇÃO DE TRANSIÇÃO: Permite que a mudança de tema (Cores) seja suave */
-        body, #dedicated-page, .modal-content {
-            transition: background-color 1s ease, color 1s ease;
         }
 
         body {
@@ -77,7 +73,7 @@
         }
 
         .magnetic-btn {
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             will-change: transform;
         }
 
@@ -118,7 +114,7 @@
 
         #mobile-menu {
             position: fixed; inset: 0;
-            background: rgba(var(--bg-color), 0.98); /* Atualizado para tema dinâmico */
+            background: rgba(13, 12, 11, 0.98);
             backdrop-filter: blur(20px); z-index: 49;
             transform: translateY(-100%);
             transition: transform 0.8s cubic-bezier(0.86, 0, 0.07, 1);
@@ -129,7 +125,7 @@
 
         .hamburger-line { 
             width: 24px; height: 1px; background-color: var(--primary); 
-            transition: transform 0.4s cubic-bezier(0.86, 0, 0.07, 1), background-color 1s ease; 
+            transition: transform 0.4s cubic-bezier(0.86, 0, 0.07, 1); 
         }
         #hamburger-btn.open .hamburger-line:first-child { transform: rotate(45deg) translate(5px, 5px); }
         #hamburger-btn.open .hamburger-line:last-child { transform: rotate(-45deg) translate(5px, -5px); }
@@ -164,7 +160,7 @@
 
         .cursor-trail {
             width: var(--cursor-trail-size); height: var(--cursor-trail-size);
-            border: 1px solid rgba(245, 238, 220, 0.5); /* Isto seria ideal com currentColor, mas mix-blend-mode é sensível. Vamos manter a base clara */
+            border: 1px solid rgba(245, 238, 220, 0.5);
             transition: width 0.3s, height 0.3s, border-color 0.3s;
             z-index: 10004;
         }
@@ -176,8 +172,8 @@
         .solar-text-container { position: relative; display: inline-block; }
         .solar-text { opacity: 0 !important; visibility: hidden !important; }
         .solar-text.solar-active { opacity: 1 !important; visibility: visible !important; transition: opacity 0.1s; }
-        .solar-spark { color: var(--primary); text-shadow: 0 0 12px var(--accent); opacity: 1 !important; }
-        .solar-dim { opacity: 0.3; color: var(--accent); transition: color 1s ease; }
+        .solar-spark { color: var(--primary); text-shadow: 0 0 12px rgba(245, 238, 220, 0.6); opacity: 1 !important; }
+        .solar-dim { opacity: 0.3; color: var(--accent); }
 
         .carousel-3d-wrapper {
             position: relative; width: 100%; 
@@ -204,7 +200,7 @@
         }
         .project-card-3d:hover {
             border-color: var(--accent);
-            box-shadow: 0 0 40px var(--accent);
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.15);
             transform: scale(1.02);
         }
         .card-image-container {
@@ -218,6 +214,7 @@
             transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s;
             filter: grayscale(80%) sepia(20%) brightness(0.8) url(#liquid-filter); 
             -webkit-user-drag: none;
+            /* OTIMIZADO: Lógica de Parallax agora responde à raiz da página via CSS. Sem delays de QuerySelector */
             transform: scale(1.05) translate(calc(var(--mx, 0) * -12px), calc(var(--my, 0) * -12px));
             will-change: transform, filter;
         }
@@ -234,7 +231,7 @@
         }
         .loader-bar {
             width: 0%; height: 1px; background: var(--accent);
-            transition: width 0.1s linear, background-color 1s ease; box-shadow: 0 0 15px var(--accent); 
+            transition: width 0.1s linear; box-shadow: 0 0 15px rgba(212,175,55,0.5); 
         }
 
         #isekai-modal {
@@ -256,7 +253,7 @@
             content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
             background: var(--accent); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: -1;
         }
-        .isekai-btn:hover { color: #000; box-shadow: 0 0 30px var(--accent); }
+        .isekai-btn:hover { color: #000; box-shadow: 0 0 30px rgba(212,175,55,0.2); }
         .isekai-btn:hover::before { transform: translateX(100%); }
 
         .modal-overlay {
@@ -295,20 +292,18 @@
         .dot-inner.active {
             background-color: var(--accent);
             transform: scale(2);
-            box-shadow: 0 0 10px var(--accent);
+            box-shadow: 0 0 10px rgba(212,175,55,0.8);
         }
 
         #flash-overlay {
             position: fixed; inset: 0; background: var(--primary); z-index: 9998;
             opacity: 0; pointer-events: none; display: none;
-            transition: background-color 1s ease;
         }
 
         .footer-shine-text {
             color: transparent; 
             -webkit-text-stroke: 1px rgba(245, 238, 220, 0.2);
-            /* Usamos currentColor no gradiente indiretamente via var para theme */
-            background: linear-gradient(110deg, transparent 35%, var(--accent) 50%, transparent 65%);
+            background: linear-gradient(110deg, transparent 35%, rgba(212, 175, 55, 0.9) 50%, transparent 65%);
             background-size: 200% auto;
             -webkit-background-clip: text; background-clip: text;
             animation: textShine 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
@@ -318,11 +313,12 @@
         .hero-shine-text {
             color: transparent; 
             -webkit-text-stroke: 2px rgba(245, 238, 220, 0.3);
-            background: linear-gradient(110deg, transparent 35%, var(--accent) 50%, transparent 65%);
+            background: linear-gradient(110deg, transparent 35%, rgba(212, 175, 55, 0.9) 50%, transparent 65%);
             background-size: 200% auto;
             -webkit-background-clip: text; background-clip: text;
             animation: textShine 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
             opacity: 0.9;
+            /* OTIMIZADO: Separa a execução desta animação na GPU e estabiliza o Reflow */
             will-change: transform, background-position;
             transform: translateZ(0); 
         }
@@ -341,11 +337,10 @@
         .holo-active .holo-mask { animation: holoScan 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
         .holo-scanline {
             position: absolute; bottom: 0; left: 0; width: 100%; height: 2px;
-            background: var(--accent); box-shadow: 0 0 15px 2px var(--accent); z-index: 30; opacity: 0;
-            transition: background-color 1s ease, box-shadow 1s ease;
+            background: var(--accent); box-shadow: 0 0 15px 2px rgba(212,175,55,0.8); z-index: 30; opacity: 0;
         }
         .holo-active .holo-scanline { animation: holoScanlineMove 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-        .holo-border-line { position: absolute; background: var(--accent); box-shadow: 0 0 8px var(--accent); opacity: 0; transition: background-color 1s ease; }
+        .holo-border-line { position: absolute; background: var(--accent); box-shadow: 0 0 8px rgba(212,175,55,0.6); opacity: 0; }
         .line-top { top: 0; left: 0; width: 100%; height: 1px; transform: translateX(-100%); }
         .line-right { top: 0; right: 0; width: 1px; height: 100%; transform: translateY(-100%); }
         .line-bottom { bottom: 0; right: 0; width: 100%; height: 1px; transform: translateX(100%); }
@@ -391,7 +386,7 @@
 
     <div class="hud-element hud-bl" aria-hidden="true">
         <div id="hud-coords">COLEÇÃO: ESSÊNCIA</div>
-        <div>ALFAIATARIA: <span id="network-status" style="color: var(--accent); transition: color 1s ease;">PREMIUM</span></div>
+        <div>ALFAIATARIA: <span id="network-status" style="color: var(--accent);">PREMIUM</span></div>
     </div>
     <div class="hud-element hud-br" aria-hidden="true">
         <div>ATELIER: <span id="crystal-count">ABERTO</span></div>
@@ -405,23 +400,23 @@
         <div class="absolute top-0 bottom-0 w-[1px] bg-white/10 left-1/2 -translate-x-1/2 -z-10"></div>
         
         <div tabindex="0" role="button" aria-label="Ir para Início" class="hud-dot relative cursor-pointer group hover-trigger p-2" onclick="SoundManager.playClick(); window.scrollToSection(0)" onkeydown="if(event.key==='Enter') this.click()">
-            <span class="absolute right-8 top-1/2 -translate-y-1/2 text-[9px] font-mono tracking-widest text-[var(--accent)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase pointer-events-none">Início</span>
+            <span class="absolute right-8 top-1/2 -translate-y-1/2 text-[9px] font-mono tracking-widest text-[#d4af37] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase pointer-events-none">Início</span>
             <div class="w-1.5 h-1.5 rounded-full bg-white/30 transition-all duration-500 dot-inner" data-z="0"></div>
         </div>
         <div tabindex="0" role="button" aria-label="Ir para Coleções" class="hud-dot relative cursor-pointer group hover-trigger p-2" onclick="SoundManager.playClick(); window.scrollToSection(1000)" onkeydown="if(event.key==='Enter') this.click()">
-            <span class="absolute right-8 top-1/2 -translate-y-1/2 text-[9px] font-mono tracking-widest text-[var(--accent)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase pointer-events-none">Coleções</span>
+            <span class="absolute right-8 top-1/2 -translate-y-1/2 text-[9px] font-mono tracking-widest text-[#d4af37] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase pointer-events-none">Coleções</span>
             <div class="w-1.5 h-1.5 rounded-full bg-white/30 transition-all duration-500 dot-inner" data-z="1000"></div>
         </div>
         <div tabindex="0" role="button" aria-label="Ir para O Atelier" class="hud-dot relative cursor-pointer group hover-trigger p-2" onclick="SoundManager.playClick(); window.scrollToSection(2000)" onkeydown="if(event.key==='Enter') this.click()">
-            <span class="absolute right-8 top-1/2 -translate-y-1/2 text-[9px] font-mono tracking-widest text-[var(--accent)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase pointer-events-none">O Atelier</span>
+            <span class="absolute right-8 top-1/2 -translate-y-1/2 text-[9px] font-mono tracking-widest text-[#d4af37] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase pointer-events-none">O Atelier</span>
             <div class="w-1.5 h-1.5 rounded-full bg-white/30 transition-all duration-500 dot-inner" data-z="2000"></div>
         </div>
         <div tabindex="0" role="button" aria-label="Ir para Contacto" class="hud-dot relative cursor-pointer group hover-trigger p-2" onclick="SoundManager.playClick(); window.scrollToSection(3000)" onkeydown="if(event.key==='Enter') this.click()">
-            <span class="absolute right-8 top-1/2 -translate-y-1/2 text-[9px] font-mono tracking-widest text-[var(--accent)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase pointer-events-none">Contacto</span>
+            <span class="absolute right-8 top-1/2 -translate-y-1/2 text-[9px] font-mono tracking-widest text-[#d4af37] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase pointer-events-none">Contacto</span>
             <div class="w-1.5 h-1.5 rounded-full bg-white/30 transition-all duration-500 dot-inner" data-z="3000"></div>
         </div>
         <div tabindex="0" role="button" aria-label="Ir para o Fim da Página" class="hud-dot relative cursor-pointer group hover-trigger p-2" onclick="SoundManager.playClick(); window.scrollToSection(4000)" onkeydown="if(event.key==='Enter') this.click()">
-            <span class="absolute right-8 top-1/2 -translate-y-1/2 text-[9px] font-mono tracking-widest text-[var(--accent)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase pointer-events-none">Fim</span>
+            <span class="absolute right-8 top-1/2 -translate-y-1/2 text-[9px] font-mono tracking-widest text-[#d4af37] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase pointer-events-none">Fim</span>
             <div class="w-1.5 h-1.5 rounded-full bg-white/30 transition-all duration-500 dot-inner" data-z="4000"></div>
         </div>
     </nav>
@@ -446,7 +441,7 @@
     <div id="isekai-modal" role="dialog" aria-modal="true" aria-labelledby="isekai-title">
         <div class="flex justify-between border-b border-white/10 pb-4 mb-6 text-[10px] font-mono tracking-widest text-gray-400 uppercase">
             <span>Manifesto_Marca</span>
-            <span style="color: var(--accent); transition: color 1s ease;">Est. 2026</span>
+            <span style="color: var(--accent);">Est. 2026</span>
         </div>
         <div class="font-display text-2xl md:text-4xl leading-relaxed text-gray-200 mb-8 w-full text-center md:text-left whitespace-normal">
             <p id="isekai-text" class="solar-text" data-value="A verdadeira elegância é atemporal. 
@@ -482,12 +477,12 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         </div>
         
         <div id="nav-links" class="hidden md:flex gap-12 font-mono text-[10px] tracking-widest text-gray-400 opacity-0 pointer-events-none uppercase">
-            <a tabindex="0" href="#" class="hover:text-[var(--primary)] transition-colors hover-trigger magnetic-btn solar-text" data-value="Coleções" onclick="SoundManager.playClick(); window.scrollToSection(1000)">Coleções</a>
-            <a tabindex="0" href="#" class="hover:text-[var(--primary)] transition-colors hover-trigger magnetic-btn solar-text" data-value="O Atelier" onclick="SoundManager.playClick(); window.scrollToSection(2000)">O Atelier</a>
-            <a tabindex="0" href="#" class="hover:text-[var(--primary)] transition-colors hover-trigger magnetic-btn solar-text" data-value="Contacto" onclick="SoundManager.playClick(); window.scrollToSection(3000)">Contacto</a>
+            <a tabindex="0" href="#" class="hover:text-white transition-colors hover-trigger magnetic-btn solar-text" data-value="Coleções" onclick="SoundManager.playClick(); window.scrollToSection(1000)">Coleções</a>
+            <a tabindex="0" href="#" class="hover:text-white transition-colors hover-trigger magnetic-btn solar-text" data-value="O Atelier" onclick="SoundManager.playClick(); window.scrollToSection(2000)">O Atelier</a>
+            <a tabindex="0" href="#" class="hover:text-white transition-colors hover-trigger magnetic-btn solar-text" data-value="Contacto" onclick="SoundManager.playClick(); window.scrollToSection(3000)">Contacto</a>
         </div>
         
-        <button tabindex="0" id="nav-cta" aria-label="Agendar Prova" class="hidden md:block border border-white/20 px-6 py-2 rounded-full text-[10px] font-mono tracking-widest hover:bg-[var(--primary)] hover:text-[var(--bg-color)] transition-colors duration-500 hover-trigger open-contact-btn opacity-0 pointer-events-none magnetic-btn uppercase solar-text" data-value="Agendar Prova">
+        <button tabindex="0" id="nav-cta" aria-label="Agendar Prova" class="hidden md:block border border-white/20 px-6 py-2 rounded-full text-[10px] font-mono tracking-widest hover:bg-white hover:text-black transition-colors duration-500 hover-trigger open-contact-btn opacity-0 pointer-events-none magnetic-btn uppercase solar-text" data-value="Agendar Prova">
             Agendar Prova
         </button>
 
@@ -520,7 +515,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 <div class="absolute bottom-12 left-1/2 -translate-x-1/2">
                     <div tabindex="0" role="button" aria-label="Explorar Coleções" class="flex flex-col items-center gap-4 hover-trigger cursor-pointer magnetic-btn" onclick="SoundManager.playClick(); window.scrollToSection(1000)" onkeydown="if(event.key==='Enter') this.click()">
                         <span class="text-[9px] font-mono tracking-widest text-gray-500 uppercase">Explorar as Coleções</span>
-                        <div class="w-[1px] h-12 bg-gradient-to-b from-[var(--accent)] to-transparent opacity-50 transition-colors duration-1000"></div>
+                        <div class="w-[1px] h-12 bg-gradient-to-b from-[#d4af37] to-transparent opacity-50"></div>
                     </div>
                 </div>
             </div>
@@ -569,7 +564,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                     <div tabindex="0" role="listitem" aria-expanded="false" class="service-item border-b border-white/10 py-10 cursor-pointer group hover:pl-4 transition-all duration-500 hover-trigger" onclick="toggleService(this)" onkeydown="if(event.key==='Enter') this.click()">
                         <div class="flex justify-between items-baseline">
                             <h3 class="text-4xl md:text-6xl font-display italic text-gray-400 group-hover:text-white transition-colors solar-text" data-value="Materiais Premium">Materiais Premium</h3>
-                            <span class="font-mono text-xs text-[var(--accent)] opacity-60 group-hover:opacity-100 solar-text transition-colors duration-1000" data-value="01">01</span>
+                            <span class="font-mono text-xs text-[#d4af37] opacity-60 group-hover:opacity-100 solar-text" data-value="01">01</span>
                         </div>
                         <div class="service-desc max-h-0 overflow-hidden transition-all duration-500 ease-in-out opacity-0">
                             <p class="pt-6 max-w-xl text-gray-400 font-light text-sm leading-relaxed solar-text" data-value="Tecidos selecionados meticulosamente. Das fibras de algodão orgânico à seda mais pura, garantimos um toque inconfundível e conforto absoluto.">
@@ -580,7 +575,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                     <div tabindex="0" role="listitem" aria-expanded="false" class="service-item border-b border-white/10 py-10 cursor-pointer group hover:pl-4 transition-all duration-500 hover-trigger" onclick="toggleService(this)" onkeydown="if(event.key==='Enter') this.click()">
                         <div class="flex justify-between items-baseline">
                             <h3 class="text-4xl md:text-6xl font-display italic text-gray-400 group-hover:text-white transition-colors solar-text" data-value="Design Autoral">Design Autoral</h3>
-                            <span class="font-mono text-xs text-[var(--accent)] opacity-60 group-hover:opacity-100 solar-text transition-colors duration-1000" data-value="02">02</span>
+                            <span class="font-mono text-xs text-[#d4af37] opacity-60 group-hover:opacity-100 solar-text" data-value="02">02</span>
                         </div>
                         <div class="service-desc max-h-0 overflow-hidden transition-all duration-500 ease-in-out opacity-0">
                             <p class="pt-6 max-w-xl text-gray-400 font-light text-sm leading-relaxed solar-text" data-value="Cada peça carrega o DNA SONIEN'S. Estampas criadas à mão e paletas neutras que oferecem versatilidade sem abrir mão do statement visual.">
@@ -591,7 +586,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                     <div tabindex="0" role="listitem" aria-expanded="false" class="service-item border-b border-white/10 py-10 cursor-pointer group hover:pl-4 transition-all duration-500 hover-trigger" onclick="toggleService(this)" onkeydown="if(event.key==='Enter') this.click()">
                         <div class="flex justify-between items-baseline">
                             <h3 class="text-4xl md:text-6xl font-display italic text-gray-400 group-hover:text-white transition-colors solar-text" data-value="Corte Preciso">Corte Preciso</h3>
-                            <span class="font-mono text-xs text-[var(--accent)] opacity-60 group-hover:opacity-100 solar-text transition-colors duration-1000" data-value="03">03</span>
+                            <span class="font-mono text-xs text-[#d4af37] opacity-60 group-hover:opacity-100 solar-text" data-value="03">03</span>
                         </div>
                         <div class="service-desc max-h-0 overflow-hidden transition-all duration-500 ease-in-out opacity-0">
                             <p class="pt-6 max-w-xl text-gray-400 font-light text-sm leading-relaxed solar-text" data-value="A alfaiataria levada ao extremo do perfeccionismo. Caimentos impecáveis estudados exaustivamente para esculpir e valorizar a silhueta.">
@@ -610,7 +605,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                     Agende <br> Uma Prova
                 </h2>
                 <div class="mt-4 flex justify-center">
-                    <button tabindex="0" aria-label="Abrir Formulário de Atendimento" class="border border-[var(--accent)]/50 text-[var(--accent)] px-10 py-4 rounded-full text-xs font-mono tracking-widest hover:bg-[var(--accent)] hover:text-[var(--bg-color)] transition-colors duration-500 hover-trigger open-contact-btn magnetic-btn uppercase solar-text" data-value="Contactar Atelier">
+                    <button tabindex="0" aria-label="Abrir Formulário de Atendimento" class="border border-[#d4af37]/50 text-[#d4af37] px-10 py-4 rounded-full text-xs font-mono tracking-widest hover:bg-[#d4af37] hover:text-black transition-colors duration-500 hover-trigger open-contact-btn magnetic-btn uppercase solar-text" data-value="Contactar Atelier">
                         Contactar Atelier
                     </button>
                 </div>
@@ -620,16 +615,12 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         <section class="section-3d" data-z="4000" id="footer-section" aria-label="Rodapé do Site">
             <div class="flex flex-col items-center justify-center text-center gap-12 w-full px-6">
                 <div class="text-6xl brand-logo-text tracking-tighter footer-shine-text" aria-hidden="true">SONIEN'S</div>
-                <div class="flex gap-8 md:gap-12 items-center justify-center font-mono text-xs text-gray-400 uppercase flex-wrap">
-                    <a tabindex="0" href="#" aria-label="Visitar o nosso Instagram" class="flex flex-col items-center gap-4 hover:text-[var(--accent)] transition-colors hover-trigger magnetic-btn group">
+                <div class="flex gap-12 items-center justify-center font-mono text-xs text-gray-400 uppercase">
+                    <a tabindex="0" href="#" aria-label="Visitar o nosso Instagram" class="flex flex-col items-center gap-4 hover:text-[#d4af37] transition-colors hover-trigger magnetic-btn group">
                         <i data-lucide="instagram" class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
                         <span class="solar-text" data-value="Instagram">Instagram</span>
                     </a>
-                    <a tabindex="0" href="https://wa.me/5532988212111" target="_blank" aria-label="Contactar via WhatsApp" class="flex flex-col items-center gap-4 hover:text-[var(--accent)] transition-colors hover-trigger magnetic-btn group">
-                        <svg class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.489-1.761-1.663-2.06-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-                        <span class="solar-text" data-value="WhatsApp">WhatsApp</span>
-                    </a>
-                    <a tabindex="0" href="#" aria-label="Ver localização da Boutique" class="flex flex-col items-center gap-4 hover:text-[var(--accent)] transition-colors hover-trigger magnetic-btn group">
+                    <a tabindex="0" href="#" aria-label="Ver localização da Boutique" class="flex flex-col items-center gap-4 hover:text-[#d4af37] transition-colors hover-trigger magnetic-btn group">
                         <i data-lucide="map-pin" class="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity" aria-hidden="true"></i>
                         <span class="solar-text" data-value="Boutique">Boutique</span>
                     </a>
@@ -642,47 +633,31 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         </section>
     </div>
 
-    <div id="dedicated-page" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Detalhes da Coleção Selecionada" class="fixed inset-0 bg-[var(--bg-color)] overflow-y-auto hidden opacity-0 transition-opacity duration-700 pointer-events-none" style="z-index: 10000;">
+    <div id="dedicated-page" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Detalhes da Coleção Selecionada" class="fixed inset-0 z-[10000] bg-[var(--bg-color)] overflow-y-auto hidden opacity-0 transition-opacity duration-700 pointer-events-none">
         <div class="noise-overlay"></div>
         
         <div class="sticky top-0 w-full p-6 md:p-10 flex justify-between items-center z-50 bg-[#0d0c0b]/90 backdrop-blur-md border-b border-white/5">
-            <button tabindex="0" id="btn-back-page" aria-label="Voltar às Coleções" class="text-[var(--primary)] hover-trigger magnetic-btn flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest hover:text-[var(--accent)] transition-colors">
+            <button tabindex="0" id="btn-back-page" aria-label="Voltar às Coleções" class="text-white hover-trigger magnetic-btn flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest hover:text-[#d4af37] transition-colors">
                 <i data-lucide="arrow-left" class="w-5 h-5" aria-hidden="true"></i> Voltar às Coleções
             </button>
-            <div class="brand-logo-text text-xl tracking-widest text-[var(--accent)]" aria-hidden="true">SONIEN'S</div>
+            <div class="brand-logo-text text-xl tracking-widest text-[#d4af37]" aria-hidden="true">SONIEN'S</div>
         </div>
 
-        <div class="max-w-7xl mx-auto px-6 py-12 md:py-20 flex flex-col gap-16 md:gap-24">
-            
-            <div class="flex flex-col items-center text-center">
-                <span id="page-tag" class="text-[10px] font-mono text-[var(--accent)] border border-[var(--accent)]/30 px-3 py-1 uppercase tracking-widest mb-6 inline-block solar-text transition-colors duration-1000" aria-live="polite"></span>
-                <h2 id="page-title" class="text-5xl md:text-8xl font-display italic text-[var(--primary)] mb-8 solar-text transition-colors duration-1000" aria-live="polite"></h2>
-            </div>
-            
-            <div class="w-full h-[50vh] md:h-[70vh] overflow-hidden border border-white/10 relative group">
-                <img id="page-image" src="" class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" alt="Fotografia de arte da coleção">
-            </div>
-
-            <div class="flex flex-col items-center">
-                <p id="page-desc" class="text-gray-400 font-light leading-relaxed text-sm md:text-lg whitespace-pre-line text-left md:text-center max-w-3xl mx-auto solar-text" aria-live="polite"></p>
-            </div>
-
-            <div id="page-gallery" class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-            </div>
-
-            <div id="btn-container-reveal" class="flex flex-col items-center justify-center mt-8 mb-12 gap-4 w-full">
-                <span class="text-[9px] font-mono tracking-widest text-gray-500 uppercase">Disponível para Encomenda</span>
-                <button tabindex="0" id="show-form-btn" aria-label="Abrir formulário de personalização" class="border border-[var(--accent)]/50 text-[var(--accent)] px-10 py-5 md:px-16 md:py-6 rounded-full text-xl md:text-3xl font-display italic hover:bg-[var(--accent)] hover:text-[var(--bg-color)] transition-all duration-500 hover-trigger cursor-pointer magnetic-btn inline-block solar-text outline-none focus-visible:scale-105" data-value=""></button>
-            </div>
-            
-            <div id="project-form-container" class="bg-white/5 p-8 md:p-12 border border-white/10 relative overflow-hidden flex-col justify-center hidden opacity-0 transition-all duration-700 w-full max-w-3xl mx-auto">
-                <button id="close-form-btn" aria-label="Fechar Formulário" class="absolute top-6 right-6 text-[var(--primary)] hover:rotate-90 transition-transform hover-trigger z-50 magnetic-btn">
-                    <i data-lucide="x" class="w-6 h-6" aria-hidden="true"></i>
-                </button>
+        <div class="max-w-7xl mx-auto px-6 py-12 md:py-20 flex flex-col lg:flex-row gap-12 lg:gap-20">
+            <div class="flex-1 flex flex-col justify-center">
+                <span id="page-tag" class="text-[10px] font-mono text-[#d4af37] border border-[#d4af37]/30 px-3 py-1 uppercase tracking-widest mb-6 inline-block self-start solar-text" aria-live="polite"></span>
+                <h2 id="page-title" class="text-5xl md:text-7xl font-display italic text-white mb-6 solar-text" aria-live="polite"></h2>
+                <p id="page-desc" class="text-gray-400 font-light leading-relaxed text-sm md:text-base mb-12 whitespace-pre-line solar-text" aria-live="polite"></p>
                 
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[var(--accent)] to-transparent opacity-50 transition-colors duration-1000"></div>
+                <div class="w-full h-72 md:h-[450px] overflow-hidden border border-white/10 relative group">
+                    <img id="page-image" src="" class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" alt="Fotografia de arte da coleção">
+                </div>
+            </div>
+            
+            <div class="flex-1 bg-white/5 p-8 md:p-12 border border-white/10 relative overflow-hidden flex flex-col justify-center">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#d4af37] to-transparent opacity-50"></div>
                 
-                <h3 class="text-3xl md:text-4xl font-display italic text-[var(--primary)] mb-2 transition-colors duration-1000">Personalizar Peça</h3>
+                <h3 class="text-3xl md:text-4xl font-display italic text-white mb-2">Personalizar Peça</h3>
                 <p class="text-gray-500 font-mono text-[10px] mb-10 uppercase tracking-widest">Camisetas Estampadas Premium</p>
                 
                 <div class="space-y-6 w-full">
@@ -694,23 +669,23 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                     <div class="grid grid-cols-2 gap-6">
                         <div>
                             <label for="dp-size" class="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-2 block">Tamanho</label>
-                            <select id="dp-size" tabindex="0" class="form-input hover-trigger bg-transparent appearance-none cursor-pointer text-[var(--primary)]">
-                                <option value="" disabled selected class="bg-[var(--bg-color)] text-gray-500">Escolha...</option>
-                                <option value="P" class="bg-[var(--bg-color)]">P</option>
-                                <option value="M" class="bg-[var(--bg-color)]">M</option>
-                                <option value="G" class="bg-[var(--bg-color)]">G</option>
-                                <option value="GG" class="bg-[var(--bg-color)]">GG</option>
-                                <option value="XG" class="bg-[var(--bg-color)]">XG</option>
+                            <select id="dp-size" tabindex="0" class="form-input hover-trigger bg-transparent appearance-none cursor-pointer text-white">
+                                <option value="" disabled selected class="bg-[#0d0c0b] text-gray-500">Escolha...</option>
+                                <option value="P" class="bg-[#0d0c0b]">P</option>
+                                <option value="M" class="bg-[#0d0c0b]">M</option>
+                                <option value="G" class="bg-[#0d0c0b]">G</option>
+                                <option value="GG" class="bg-[#0d0c0b]">GG</option>
+                                <option value="XG" class="bg-[#0d0c0b]">XG</option>
                             </select>
                         </div>
                         <div>
                             <label for="dp-color" class="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-2 block">Cor Base</label>
-                            <select id="dp-color" tabindex="0" class="form-input hover-trigger bg-transparent appearance-none cursor-pointer text-[var(--primary)]">
-                                <option value="" disabled selected class="bg-[var(--bg-color)] text-gray-500">Escolha...</option>
-                                <option value="Preto" class="bg-[var(--bg-color)]">Preto Absoluto</option>
-                                <option value="Branco" class="bg-[var(--bg-color)]">Branco Puro</option>
-                                <option value="Off-White" class="bg-[var(--bg-color)]">Off-White (Creme)</option>
-                                <option value="Cinza Mescla" class="bg-[var(--bg-color)]">Cinza Mescla</option>
+                            <select id="dp-color" tabindex="0" class="form-input hover-trigger bg-transparent appearance-none cursor-pointer text-white">
+                                <option value="" disabled selected class="bg-[#0d0c0b] text-gray-500">Escolha...</option>
+                                <option value="Preto" class="bg-[#0d0c0b]">Preto Absoluto</option>
+                                <option value="Branco" class="bg-[#0d0c0b]">Branco Puro</option>
+                                <option value="Off-White" class="bg-[#0d0c0b]">Off-White (Creme)</option>
+                                <option value="Cinza Mescla" class="bg-[#0d0c0b]">Cinza Mescla</option>
                             </select>
                         </div>
                     </div>
@@ -720,7 +695,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                         <textarea id="dp-msg" tabindex="0" class="form-input hover-trigger resize-none" rows="3" placeholder="Qual personagem, cena ou citação deseja? Detalhe a sua ideia..."></textarea>
                     </div>
                     
-                    <button id="dp-submit" tabindex="0" class="w-full bg-[var(--accent)] text-[var(--bg-color)] font-mono font-bold text-xs py-5 hover:bg-[var(--primary)] transition-colors tracking-widest mt-8 hover-trigger magnetic-btn uppercase">
+                    <button id="dp-submit" tabindex="0" class="w-full bg-[#d4af37] text-black font-mono font-bold text-xs py-5 hover:bg-white transition-colors tracking-widest mt-8 hover-trigger magnetic-btn uppercase">
                         Solicitar Criação
                     </button>
                 </div>
@@ -731,15 +706,15 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
     </div>
 
     <div id="contact-modal" aria-hidden="true" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="contact-title">
-        <div class="modal-content max-w-4xl bg-[var(--bg-color)] border border-white/10 p-0 flex flex-row overflow-hidden relative transition-colors duration-1000"> 
-            <button id="close-contact" tabindex="0" aria-label="Fechar Contacto" class="absolute top-6 right-6 text-[var(--primary)] hover:rotate-90 transition-transform hover-trigger z-50 magnetic-btn">
+        <div class="modal-content max-w-4xl bg-[#0d0c0b] border border-white/10 p-0 flex flex-row overflow-hidden relative"> 
+            <button id="close-contact" tabindex="0" aria-label="Fechar Contacto" class="absolute top-6 right-6 text-white hover:rotate-90 transition-transform hover-trigger z-50 magnetic-btn">
                 <i data-lucide="x" class="w-6 h-6" aria-hidden="true"></i>
             </button>
-            <div class="hidden md:flex w-24 bg-[var(--accent)]/5 border-r border-white/5 flex-col justify-center items-center py-10 relative overflow-hidden transition-colors duration-1000">
-                 <h2 id="contact-title" class="brand-logo-text text-4xl tracking-widest text-[var(--accent)]/20 whitespace-nowrap absolute transition-colors duration-1000" style="writing-mode: vertical-rl; transform: rotate(180deg);">SONIEN'S</h2>
+            <div class="hidden md:flex w-24 bg-[#d4af37]/5 border-r border-white/5 flex-col justify-center items-center py-10 relative overflow-hidden">
+                 <h2 id="contact-title" class="brand-logo-text text-4xl tracking-widest text-[#d4af37]/20 whitespace-nowrap absolute" style="writing-mode: vertical-rl; transform: rotate(180deg);">SONIEN'S</h2>
             </div>
             <div class="flex-1 p-8 md:p-12 flex flex-col justify-center">
-                <h3 class="text-3xl font-display italic text-[var(--primary)] mb-2 transition-colors duration-1000">Atendimento VIP</h3>
+                <h3 class="text-3xl font-display italic text-white mb-2">Atendimento VIP</h3>
                 <p class="text-gray-500 font-mono text-xs mb-10 uppercase">Permita-nos conhecer as suas preferências.</p>
                 <div class="space-y-8 w-full">
                     <div>
@@ -754,7 +729,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                         <label for="form-msg" class="sr-only">Peça de interesse ou detalhes</label>
                         <textarea id="form-msg" tabindex="0" class="form-input hover-trigger" rows="1" placeholder="QUAL PEÇA DESEJA EXPERIMENTAR?"></textarea>
                     </div>
-                    <button id="submit-whatsapp" tabindex="0" aria-label="Enviar Mensagem de Agendamento" class="w-full bg-[var(--accent)] text-[var(--bg-color)] font-mono font-bold text-xs py-4 hover:bg-[var(--primary)] transition-colors tracking-widest mt-4 hover-trigger magnetic-btn uppercase">
+                    <button id="submit-whatsapp" tabindex="0" aria-label="Enviar Mensagem de Agendamento" class="w-full bg-[#d4af37] text-black font-mono font-bold text-xs py-4 hover:bg-white transition-colors tracking-widest mt-4 hover-trigger magnetic-btn uppercase">
                         Solicitar Agendamento
                     </button>
                 </div>
@@ -763,60 +738,16 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
     </div>
 
     <script>
-        // CONFIGURAÇÕES GLOBAIS E DE TEMAS
+        // GLOBAL STATE
         let introCompleted = false;
         let isDedicatedPageOpen = false; 
         let scrollZ = 0;
         let targetScrollZ = 0;
         const sectionDistance = 1000;
         const maxScrollZ = 4000;
-        let particlesGeometryGlobal; // OTIMIZADO: Global para permitir mudança de cor em tempo real
-        let randomArrayGlobal; // Guarda as variações iniciais
+        let particlesMeshGlobal;
         let lastScrollTime = 0;
         const scrollCooldown = 1300; 
-
-        // SISTEMA DE TEMAS (CSS VARIÁVEIS & THREE.JS)
-        const themes = {
-            default: {
-                primary: '#f5eedc', // Creme
-                accent: '#d4af37',  // Dourado
-                bg: '#0d0c0b',      // Preto Quente
-                particle1: 0xf5eedc,
-                particle2: 0xd4af37
-            },
-            berserk: {
-                primary: '#e5e5e5', // Cinza pálido
-                accent: '#9b111e',  // Vermelho sangue escuro
-                bg: '#050303',      // Preto abissal
-                particle1: 0x9b111e, // Partículas de sangue
-                particle2: 0x333333  // Partículas de cinzas
-            }
-        };
-
-        function applyTheme(themeName) {
-            const theme = themes[themeName] || themes.default;
-            
-            // 1. Atualiza as Variáveis CSS globais (O CSS lida com a transição fluida)
-            document.documentElement.style.setProperty('--primary', theme.primary);
-            document.documentElement.style.setProperty('--accent', theme.accent);
-            document.documentElement.style.setProperty('--bg-color', theme.bg);
-
-            // 2. Atualiza as Partículas do WebGL em Tempo Real
-            if (particlesGeometryGlobal && randomArrayGlobal) {
-                const colorArray = particlesGeometryGlobal.attributes.color.array;
-                const c1 = new THREE.Color(theme.particle1);
-                const c2 = new THREE.Color(theme.particle2);
-                
-                for(let i=0; i< (colorArray.length / 3); i++) {
-                    const i3 = i * 3;
-                    const mixed = c1.clone().lerp(c2, randomArrayGlobal[i] * 0.5);
-                    colorArray[i3] = mixed.r;
-                    colorArray[i3+1] = mixed.g;
-                    colorArray[i3+2] = mixed.b;
-                }
-                particlesGeometryGlobal.attributes.color.needsUpdate = true;
-            }
-        }
         
         // CONFIGURAÇÕES EMAILJS
         const EMAILJS_PUBLIC_KEY = "mdn_-MJTIEla5ZNLS";
@@ -832,81 +763,45 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         const projects = [
             {
                 title: "Sétima Arte",
-                desc: "A magia da tela grande, agora esculpida em fios de algodão premium. A coleção Sétima Arte é um tributo visceral aos clássicos do cinema e às produções que moldaram gerações.\n\nMais do que meras estampas, capturamos a alma de cenas icônicas, a profundidade de citações inesquecíveis e a estética inconfundível de pôsteres lendários. Cada peça é desenhada à mão, traduzindo o dramatismo do cinema para o minimalismo sofisticado da alta costura urbana. O corte estruturado da malha pesada evoca a presença de um fato bem talhado, enquanto os acabamentos desfiados a laser remetem à película gasta de 35mm.\n\nSUGESTÕES DE ATELIER:\n• Silhuetas noir de obras clássicas do suspense.\n• Citações tipográficas elegantes e minimalistas bordadas à gola.\n• Releituras geométricas de cenários inesquecíveis.",
+                desc: "A magia da tela grande, agora esculpida em fios de algodão premium. A coleção Sétima Arte é um tributo visceral aos clássicos do cinema e às produções que moldaram gerações. Mais do que meras estampas, capturamos a alma de cenas icônicas, a profundidade de citações inesquecíveis e a estética inconfundível de pôsteres lendários. Cada peça é desenhada à mão, traduzindo o dramatismo do cinema para o minimalismo sofisticado da alta costura urbana.\n\nSUGESTÕES DE ATELIER:\n• Silhuetas noir de obras clássicas do suspense.\n• Citações tipográficas elegantes e minimalistas.\n• Releituras geométricas de cenários inesquecíveis.",
                 year: "CINE '26", tag: "FILMES & SÉRIES",
-                image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=2670&auto=format&fit=crop",
-                extraImages: [
-                    "https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1000&auto=format&fit=crop",
-                    "https://images.unsplash.com/photo-1542204165-65bf26472b9b?q=80&w=1000&auto=format&fit=crop"
-                ],
-                ctaText: "Personificar\na Sétima Arte"
+                image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=2670&auto=format&fit=crop" 
             },
             {
-                title: "Cultura Otaku: Berserk",
-                desc: "O Eclipse chegou ao nosso atelier. Esta coleção cápsula exclusiva mergulha nas trevas e na resiliência inabalável do universo de Kentaro Miura.\n\nCada peça é um tributo à jornada de Guts, utilizando malhas estonadas que simulam o desgaste de mil batalhas e estampas em serigrafia de alta densidade. O sangue, o aço e a Marca do Sacrifício ganham contornos de Alta Costura, transformando a brutalidade de Berserk numa declaração de estilo intemporal e sombria. A base têxtil utiliza malha de alta gramatura com caimento *oversized*, garantindo silhuetas amplas e arquitetónicas prontas para a batalha.\n\nSUGESTÕES DE ATELIER:\n• A Marca do Sacrifício bordada a fio vermelho no colarinho.\n• Painéis do Eclipse em tons de cinza chumbo nas costas.\n• A espada Dragonslayer estruturada em alto relevo ao longo da manga.",
-                year: "DROP '26", tag: "CÁPSULA ESPECIAL",
-                image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=2670&auto=format&fit=crop", 
-                pageImage: "https://i.postimg.cc/bNJsDKdt/digital_art_eclipse_clouds_berserk_wallpaper_preview_Copia.jpg", 
-                extraImages: [
-                    "https://i.postimg.cc/yYdkgwWc/1405de4e5c788d83fe2eff9e4a7ef3a3_be80a14f7660996cb117017327600989_1024_1024.webp",
-                    "https://i.postimg.cc/CL1zBWdD/3616cf8650e3b2a04381c9d03264f1cf_5811569d84ab3cfc1c17017327607027_1024_1024.webp"
-                ],
-                ctaText: "Sobreviver ao\nEclipse",
-                themeTrigger: "berserk", 
-                themeMusic: "https://anonymous-fuchsia-xkrni71i0g.edgeone.app/Berserk_soundtrack_-_4_Gatsu_(mp3.pm).mp3" // NOVO LINK DIRETO DO MP3 AQUI
+                title: "Cultura Otaku",
+                desc: "Elevamos a paixão pela animação japonesa ao patamar do design de luxo. Longe das estampas convencionais, a coleção Cultura Otaku foca-se na essência geométrica e na energia crua das obras orientais. Reimaginamos painéis clássicos de mangá com traços finos, isolamos símbolos de poder e recriamos a aura dos seus personagens favoritos com uma paleta de cores neutras e traços marcantes. Uma forma madura e incrivelmente estilosa de carregar a sua obra favorita.\n\nSUGESTÕES DE ATELIER:\n• Painéis de mangá em estilo sketch monocromático.\n• Feições de personagens com acabamento em hachura.\n• Símbolos de clãs minimalistas finamente desenhados.",
+                year: "JAPAN '26", tag: "ANIMES & MANGÁS",
+                image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=2670&auto=format&fit=crop" 
             },
             {
                 title: "Páginas Literárias",
-                desc: "A literatura ganha textura, caimento e forma. A coleção Páginas Literárias foi concebida para quem encontra refúgio entre as palavras.\n\nTransformamos os trechos que mudaram a sua vida em arte tipográfica de alto nível. Cartografamos mapas de mundos fantásticos com detalhes meticulosos e reinterpretamos capas de livros clássicos através de uma ótica contemporânea e abstrata. Vista a sua história e leve consigo o peso poético dos maiores autores da humanidade. Os tons base transitam entre o Off-White envelhecido, como papiro, e o Preto Absoluto da tinta nanquim.\n\nSUGESTÕES DE ATELIER:\n• O mapa da sua fantasia épica favorita texturizado nas costas.\n• Frases marcantes bordadas na bainha interior.\n• Elementos-chave da narrativa em estilo line-art no peito.",
+                desc: "A literatura ganha textura, caimento e forma. A coleção Páginas Literárias foi concebida para quem encontra refúgio entre as palavras. Transformamos os trechos que mudaram a sua vida em arte tipográfica de alto nível. Cartografamos mapas de mundos fantásticos com detalhes meticulosos e reinterpretamos capas de livros clássicos através de uma ótica contemporânea e abstrata. Vista a sua história e leve consigo o peso poético dos maiores autores da humanidade.\n\nSUGESTÕES DE ATELIER:\n• O mapa da sua fantasia épica favorita redesenhado.\n• Frases marcantes com tipografia vintage estruturada.\n• Elementos-chave da narrativa em estilo line-art.",
                 year: "LORE '26", tag: "LIVROS & CONTOS",
-                image: "https://images.unsplash.com/photo-1456615074700-1dc12aa7364d?q=80&w=2670&auto=format&fit=crop",
-                extraImages: [
-                    "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1000&auto=format&fit=crop",
-                    "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=1000&auto=format&fit=crop"
-                ],
-                ctaText: "Vestir a\nSua História"
+                image: "https://images.unsplash.com/photo-1456615074700-1dc12aa7364d?q=80&w=2670&auto=format&fit=crop" 
             },
             {
                 title: "Acordes & Versos",
-                desc: "Vista a frequência da sua alma. A coleção Acordes & Versos foge do óbvio das tradicionais 'camisetas de banda'. Pegamos no ritmo que dita a sua vida e traduzimo-lo num design vanguardista.\n\nCapas de álbuns históricos são desconstruídas em formas e sombras. Ondas sonoras das suas faixas favoritas ganham vida matemática na estampa. Letras de músicas tornam-se manifestos visuais com a estética premium e limpa que define o nosso atelier. Cada peça sofre um processo de lavagem vintage manual que quebra a rigidez do algodão, deixando-a com o toque de uma peça de arquivo raríssima.\n\nSUGESTÕES DE ATELIER:\n• O espectro de áudio exato do refrão da sua música em relevo.\n• Capas de álbuns icónicos em design abstrato monocromático.\n• Contornos de instrumentos em traço único contínuo.",
+                desc: "Vista a frequência da sua alma. A coleção Acordes & Versos foge do óbvio das tradicionais 'camisetas de banda'. Pegamos no ritmo que dita a sua vida e traduzimo-lo num design vanguardista. Capas de álbuns históricos são desconstruídas em formas e sombras. Ondas sonoras das suas faixas favoritas ganham vida matemática na estampa. Letras de músicas tornam-se manifestos visuais com a estética premium e limpa que define o nosso atelier.\n\nSUGESTÕES DE ATELIER:\n• O espectro de áudio exato do refrão da sua música favorita.\n• Capas de álbuns icónicos em design abstrato.\n• Contornos de instrumentos em traço único contínuo.",
                 year: "AUDIO '26", tag: "MÚSICA & BANDAS",
-                image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=2670&auto=format&fit=crop",
-                extraImages: [
-                    "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1000&auto=format&fit=crop",
-                    "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1000&auto=format&fit=crop"
-                ],
-                ctaText: "Materializar\no Som"
+                image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=2670&auto=format&fit=crop" 
             },
             {
                 title: "Raízes & Elementos",
-                desc: "Uma ode à imensidão do cosmos e à perfeição da terra. A coleção Raízes & Elementos é onde a ciência encontra a arte visual.\n\nDetalhamos constelações precisas, ciclos lunares e anatomia celeste com rigor científico e beleza imponente. Em contrapartida, exploramos a força do mundo natural com ilustrações de flora exótica, paisagens em pontilhismo e a dualidade fascinante da vida selvagem. Uma ligação profunda entre o micro e o macrocosmos. Pigmentos naturais e acabamentos sustentáveis completam o elo perfeito com a matéria prima.\n\nSUGESTÕES DE ATELIER:\n• O mapa astral exato do dia e local do seu nascimento.\n• Ilustrações botânicas vintage detalhadas a traço fino.\n• Animais de poder formados por geometria sagrada.",
+                desc: "Uma ode à imensidão do cosmos e à perfeição da terra. A coleção Raízes & Elementos é onde a ciência encontra a arte visual. Detalhamos constelações precisas, ciclos lunares e anatomia celeste com rigor científico e beleza imponente. Em contrapartida, exploramos a força do mundo natural com ilustrações de flora exótica, paisagens em pontilhismo e a dualidade fascinante da vida selvagem. Uma ligação profunda entre o micro e o macrocosmos.\n\nSUGESTÕES DE ATELIER:\n• O mapa astral exato do dia e local do seu nascimento.\n• Ilustrações botânicas vintage detalhadas a traço fino.\n• Animais de poder formados por geometria sagrada.",
                 year: "EARTH '26", tag: "NATUREZA & ASTRONOMIA",
-                image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=2674&auto=format&fit=crop",
-                extraImages: [
-                    "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=1000&auto=format&fit=crop",
-                    "https://images.unsplash.com/photo-1454789548928-9efd52dc4031?q=80&w=1000&auto=format&fit=crop"
-                ],
-                ctaText: "Ligar-se aos\nElementos"
+                image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=2674&auto=format&fit=crop" 
             },
             {
                 title: "Sua Arte Aqui",
-                desc: "A colaboração máxima entre o cliente e o criador. Na linha Bespoke (Sob Medida), a tela em branco aguarda a sua visão e a sua imaginação dita os limites.\n\nUma homenagem ao seu animal de estimação? Uma referência a um jogo que adora? Um meme transformado em arte sacra minimalista? O nosso atelier ouvirá a sua história e desenhará, a partir do zero, uma estampa 100% autoral, exclusiva e impossível de encontrar em outro lugar do mundo.\n\nO PROCESSO BESPOKE:\n1. Você descreve a sua visão e referências detalhadamente.\n2. O atelier estuda o conceito e cria opções exclusivas de design, alinhadas à nossa estética de alta costura.\n3. A sua peça única ganha vida com qualidade impecável e chega às suas mãos numa embalagem selada.",
+                desc: "A colaboração máxima entre o cliente e o criador. Na linha Bespoke (Sob Medida), a tela em branco aguarda a sua visão e a sua imaginação dita os limites. Uma homenagem ao seu animal de estimação? Uma referência a um jogo que adora? O nosso atelier ouvirá a sua história e desenhará, a partir do zero, uma estampa 100% autoral, exclusiva e impossível de encontrar em outro lugar do mundo.\n\nO PROCESSO BESPOKE:\n1. Você descreve a sua visão e referências detalhadamente.\n2. O atelier cria opções exclusivas de design.\n3. A sua peça única ganha vida com qualidade impecável.",
                 year: "BESPOKE '26", tag: "PERSONALIZÁVEL",
-                image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=2671&auto=format&fit=crop",
-                extraImages: [
-                    "https://images.unsplash.com/photo-1558692518-fc0c9ce112d8?q=80&w=1000&auto=format&fit=crop",
-                    "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=1000&auto=format&fit=crop"
-                ],
-                ctaText: "Iniciar a\nSua Obra"
+                image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=2671&auto=format&fit=crop" 
             }
         ];
 
         let lastTypingTime = 0; 
-        
-        // --- FULL SOUND MANAGER COM SUPORTE A BANDA SONORA ---
         const SoundManager = {
             ctx: null, masterGain: null, ambientNodes: [],
-            themeMusicSource: null, themeMusicGain: null,
             
             init: function() {
                 if (!this.ctx) {
@@ -917,53 +812,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                     this.masterGain.connect(this.ctx.destination);
                 }
                 if (this.ctx.state === 'suspended') this.ctx.resume();
-            },
-
-            // Função para Tocar Música Tema via URL (Carregamento em Buffer)
-            playThemeMusic: async function(url) {
-                if (!this.ctx) return;
-                this.stopThemeMusic(); // Garante que a anterior para
-                
-                try {
-                    this.themeMusicGain = this.ctx.createGain();
-                    this.themeMusicGain.gain.value = 0; 
-                    this.themeMusicGain.connect(this.masterGain);
-
-                    const response = await fetch(url);
-                    const arrayBuffer = await response.arrayBuffer();
-                    const audioBuffer = await this.ctx.decodeAudioData(arrayBuffer);
-
-                    this.themeMusicSource = this.ctx.createBufferSource();
-                    this.themeMusicSource.buffer = audioBuffer;
-                    this.themeMusicSource.loop = true; 
-                    this.themeMusicSource.connect(this.themeMusicGain);
-                    
-                    this.themeMusicSource.start(0);
-                    // Fade in cinematográfico de 3 segundos
-                    this.themeMusicGain.gain.linearRampToValueAtTime(0.4, this.ctx.currentTime + 3);
-                } catch (err) {
-                    console.warn("Música Tema não carregada:", err);
-                }
-            },
-
-            // Função para Parar a Música Tema Suavemente
-            stopThemeMusic: function() {
-                if (this.themeMusicSource && this.themeMusicGain) {
-                    const t = this.ctx.currentTime;
-                    // Previne estalos cancelando valores antigos e forçando fade out
-                    this.themeMusicGain.gain.cancelScheduledValues(t);
-                    this.themeMusicGain.gain.setValueAtTime(this.themeMusicGain.gain.value, t);
-                    this.themeMusicGain.gain.linearRampToValueAtTime(0.001, t + 2);
-                    
-                    this.themeMusicSource.stop(t + 2);
-                    
-                    setTimeout(() => {
-                        if(this.themeMusicSource) this.themeMusicSource.disconnect();
-                        if(this.themeMusicGain) this.themeMusicGain.disconnect();
-                        this.themeMusicSource = null;
-                        this.themeMusicGain = null;
-                    }, 2100);
-                }
             },
 
             playAmbient: function() {
@@ -1177,6 +1025,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 if (frame <= 50) {
                     requestAnimationFrame(step);
                 } else {
+                    // OTIMIZAÇÃO: Limpeza de DOM! Remove os spans para renderização limpa do CSS e GPU
                     element.innerHTML = originalText.replace(/\n/g, '<br>');
                 }
             }
@@ -1198,13 +1047,11 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             const geometry = new THREE.BufferGeometry();
             const posArray = new Float32Array(particlesCount * 3);
             const originalPosArray = new Float32Array(particlesCount * 3);
-            
-            // OTIMIZADO: Arrays Globais para o Engine de Temas poder manipulá-los no futuro
-            randomArrayGlobal = new Float32Array(particlesCount);
+            const randomArray = new Float32Array(particlesCount);
             const colorArray = new Float32Array(particlesCount * 3);
             
-            const color1 = new THREE.Color(themes.default.particle1);
-            const color2 = new THREE.Color(themes.default.particle2);
+            const color1 = new THREE.Color(0xf5eedc);
+            const color2 = new THREE.Color(0xd4af37);
 
             const tunnelLength = 6000; 
 
@@ -1216,15 +1063,14 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 
                 posArray[i3] = x; posArray[i3+1] = y; posArray[i3+2] = z;
                 originalPosArray[i3] = x; originalPosArray[i3+1] = y; originalPosArray[i3+2] = z;
-                randomArrayGlobal[i] = Math.random();
+                randomArray[i] = Math.random();
 
-                const mixedColor = color1.clone().lerp(color2, randomArrayGlobal[i] * 0.5);
+                const mixedColor = color1.clone().lerp(color2, Math.random() * 0.5);
                 colorArray[i3] = mixedColor.r; colorArray[i3+1] = mixedColor.g; colorArray[i3+2] = mixedColor.b;
             }
 
             geometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
             geometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
-            particlesGeometryGlobal = geometry; // Guarda referência global
 
             const material = new THREE.PointsMaterial({
                 size: 0.9, vertexColors: true, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending
@@ -1276,9 +1122,9 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                         positions[i3+2] += tunnelLength;
                     }
 
-                    const driftX = Math.sin(time * 0.8 + randomArrayGlobal[i] * 10) * 4;
-                    const driftY = Math.cos(time * 0.6 + randomArrayGlobal[i] * 10) * 4;
-                    const distFactor = 1 + (randomArrayGlobal[i] * 0.5);
+                    const driftX = Math.sin(time * 0.8 + randomArray[i] * 10) * 4;
+                    const driftY = Math.cos(time * 0.6 + randomArray[i] * 10) * 4;
+                    const distFactor = 1 + (randomArray[i] * 0.5);
 
                     let targetX = originalPosArray[i3] - (forceX * distFactor) + driftX;
                     let targetY = originalPosArray[i3+1] - (forceY * distFactor) + driftY;
@@ -1337,7 +1183,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                         isHovering = true;
                         trail.style.width = "60px";
                         trail.style.height = "60px";
-                        trail.style.backgroundColor = "rgba(212, 175, 55, 0.15)"; /* Modificar background do cursor para o Hover */
+                        trail.style.backgroundColor = "rgba(212, 175, 55, 0.15)";
                         trail.style.borderColor = "transparent";
                         SoundManager.playHover();
                     } else {
@@ -1345,7 +1191,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                         trail.style.width = "var(--cursor-trail-size)";
                         trail.style.height = "var(--cursor-trail-size)";
                         trail.style.backgroundColor = "transparent";
-                        trail.style.borderColor = "var(--accent)";
+                        trail.style.borderColor = "rgba(245, 238, 220, 0.5)";
                     }
                 }, { passive: true });
             }
@@ -1380,7 +1226,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 
                 elem.addEventListener('mouseleave', () => {
                     elem.style.transform = `translate(0px, 0px)`;
-                    elem.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease';
+                    elem.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
                 });
             });
         }
@@ -1406,14 +1252,14 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                     <div class="flex flex-col flex-1 w-full min-w-0">
                         <div class="flex justify-between items-end mt-4 mb-3 w-full">
                             <div class="flex-1 min-w-0 pr-4">
-                                <span class="text-[9px] font-mono text-[var(--accent)] tracking-wider block mb-1 truncate transition-colors duration-1000">${proj.tag}</span>
-                                <h3 class="text-2xl font-display italic text-white truncate solar-text card-solar-text transition-colors duration-1000" data-value="${proj.title}">${proj.title}</h3>
+                                <span class="text-[9px] font-mono text-[#d4af37] tracking-wider block mb-1 truncate">${proj.tag}</span>
+                                <h3 class="text-2xl font-display italic text-white truncate solar-text card-solar-text" data-value="${proj.title}">${proj.title}</h3>
                             </div>
                             <span class="text-[9px] font-mono text-gray-500 flex-shrink-0">${proj.year}</span>
                         </div>
                         <div class="w-full relative flex-1 min-h-0">
-                        <p class="text-[11px] text-gray-400 font-light leading-relaxed break-words whitespace-normal line-clamp-4 solar-text card-solar-text" data-value="${proj.desc.split('\n')[0]}">
-                            ${proj.desc.split('\n')[0]}
+                        <p class="text-[11px] text-gray-400 font-light leading-relaxed break-words whitespace-normal line-clamp-4 solar-text card-solar-text" data-value="${proj.desc}">
+                            ${proj.desc}
                         </p>
                     </div>
                 </div>
@@ -1430,15 +1276,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                     if(e.type === 'click') { e.preventDefault(); e.stopPropagation(); return; }
                 }
                 SoundManager.playClick();
-
-                // GATILHO DE TEMA E MÚSICA
-                if (proj.themeTrigger) {
-                    applyTheme(proj.themeTrigger);
-                    // NOVO: Toca a música específica do projeto, se existir
-                    if (proj.themeMusic) {
-                        SoundManager.playThemeMusic(proj.themeMusic);
-                    }
-                }
                 
                 document.getElementById('page-title').innerText = proj.title;
                 document.getElementById('page-title').dataset.value = proj.title;
@@ -1449,33 +1286,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 document.getElementById('page-tag').innerText = proj.tag;
                 document.getElementById('page-tag').dataset.value = proj.tag;
                 
-                // NOVO: Se o projeto tiver uma 'pageImage' específica, usa ela. Senão, cai para a padrão.
-                document.getElementById('page-image').src = proj.pageImage || proj.image;
-
-                const gallery = document.getElementById('page-gallery');
-                gallery.innerHTML = '';
-                if(proj.extraImages) {
-                    proj.extraImages.forEach(imgUrl => {
-                        gallery.innerHTML += `
-                            <div class="w-full h-64 md:h-[450px] overflow-hidden border border-white/10 group">
-                                <img src="${imgUrl}" class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" alt="Detalhe da coleção">
-                            </div>
-                        `;
-                    });
-                }
-
-                const showFormBtn = document.getElementById('show-form-btn');
-                const flatText = proj.ctaText.replace('\n', ' '); 
-                showFormBtn.innerText = flatText;
-                showFormBtn.dataset.value = flatText;
-                showFormBtn.style.opacity = 1;
-                showFormBtn.style.pointerEvents = 'auto';
-                document.getElementById('btn-container-reveal').style.display = 'flex';
-                
-                const formContainer = document.getElementById('project-form-container');
-                formContainer.classList.add('hidden');
-                formContainer.classList.remove('flex');
-                formContainer.style.opacity = 0;
+                document.getElementById('page-image').src = proj.image;
                 
                 document.getElementById('dp-size').value = "";
                 document.getElementById('dp-color').value = "";
@@ -1490,13 +1301,10 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 page.style.opacity = 1;
                 page.style.pointerEvents = 'auto';
                 
-                page.scrollTop = 0;
-                
                 setTimeout(() => {
                     solarReveal(document.getElementById('page-title'));
                     solarReveal(document.getElementById('page-tag'));
                     solarReveal(document.getElementById('page-desc'));
-                    solarReveal(document.getElementById('show-form-btn'));
                 }, 300);
             };
 
@@ -1759,6 +1567,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 }
             }, { passive: true });
             
+            // OTIMIZADO: Lógica fora do EventListener 
             const leftImg = document.querySelector('#service-img-left .service-img-inner');
             const rightImg = document.querySelector('#service-img-right .service-img-inner');
             const heroTitle = document.querySelector('.hero-shine-text');
@@ -1828,7 +1637,9 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             }
         };
 
+        // --- INIT SEQUENCE ---
         window.addEventListener('load', () => {
+            // INICIALIZAÇÃO EMAILJS
             if (typeof emailjs !== 'undefined') {
                 emailjs.init(EMAILJS_PUBLIC_KEY);
             }
@@ -1920,58 +1731,13 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 page.style.opacity = 0;
                 page.style.pointerEvents = 'none';
                 page.setAttribute('aria-hidden', 'true');
-                
-                // RETORNO AO TEMA PADRÃO E PARAR MÚSICA AO FECHAR PROJETO TEMÁTICO
-                applyTheme('default');
-                SoundManager.stopThemeMusic();
-
                 setTimeout(() => {
                     page.style.display = 'none';
                     page.classList.add('hidden');
                 }, 700);
             });
 
-            document.getElementById('show-form-btn').addEventListener('click', function() {
-                SoundManager.playClick();
-                const formContainer = document.getElementById('project-form-container');
-                
-                this.style.opacity = 0;
-                this.style.pointerEvents = 'none';
-                
-                setTimeout(() => {
-                    document.getElementById('btn-container-reveal').style.display = 'none'; 
-                    
-                    formContainer.classList.remove('hidden');
-                    formContainer.classList.add('flex');
-                    void formContainer.offsetWidth; 
-                    formContainer.style.opacity = 1;
-                    lucide.createIcons(); 
-                    
-                    formContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 400);
-            });
-
-            document.getElementById('close-form-btn').addEventListener('click', function() {
-                SoundManager.playClick();
-                const formContainer = document.getElementById('project-form-container');
-                const btnContainer = document.getElementById('btn-container-reveal');
-                const showFormBtn = document.getElementById('show-form-btn');
-                
-                formContainer.style.opacity = 0;
-                
-                setTimeout(() => {
-                    formContainer.classList.add('hidden');
-                    formContainer.classList.remove('flex');
-                    
-                    btnContainer.style.display = 'flex';
-                    void showFormBtn.offsetWidth; 
-                    showFormBtn.style.opacity = 1;
-                    showFormBtn.style.pointerEvents = 'auto';
-                    
-                    btnContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 400);
-            });
-
+            // WHATSAPP SUBMIT (Página Dedicada - Estampas) - OTIMIZADO PARA EMAILJS
             document.getElementById('dp-submit').addEventListener('click', function() {
                 SoundManager.playClick();
 
@@ -1992,6 +1758,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
 
                 if(SoundManager.playSupernova) SoundManager.playSupernova();
 
+                // Parâmetros para o Template do EmailJS
                 const templateParams = {
                     collection: collection,
                     from_name: name,
@@ -2000,6 +1767,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                     message: msg
                 };
 
+                // Chamada Real à API do EmailJS
                 emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
                     .then(() => {
                         this.innerText = "PEDIDO ENVIADO ✓";
@@ -2020,9 +1788,6 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                             
                             setTimeout(() => {
                                 if(flash) { flash.style.transition = "opacity 1.0s ease-in-out"; flash.style.opacity = 0; }
-                                // RETORNA O TEMA PADRÃO E PARA MÚSICA AO FINALIZAR PEDIDO
-                                applyTheme('default');
-                                SoundManager.stopThemeMusic();
                             }, 100);
 
                             setTimeout(() => {
@@ -2051,6 +1816,7 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                     });
             });
 
+            // WHATSAPP SUBMIT (Formulário Geral / Contato) - OTIMIZADO PARA EMAILJS
             document.getElementById('submit-whatsapp').addEventListener('click', function() {
                 SoundManager.playClick();
 
@@ -2069,12 +1835,14 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
 
                 if(SoundManager.playSupernova) SoundManager.playSupernova();
 
+                // Parâmetros para o Template do EmailJS
                 const templateParams = {
                     from_name: name,
                     reply_to: email,
                     message: msg
                 };
 
+                // Chamada Real à API do EmailJS
                 emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
                     .then(() => {
                         this.innerText = "AGENDAMENTO SOLICITADO ✓";
