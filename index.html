@@ -118,7 +118,7 @@
 
         #mobile-menu {
             position: fixed; inset: 0;
-            background: rgba(var(--bg-color), 0.98); /* Atualizado para tema dinâmico */
+            background: rgba(var(--bg-color), 0.98); 
             backdrop-filter: blur(20px); z-index: 49;
             transform: translateY(-100%);
             transition: transform 0.8s cubic-bezier(0.86, 0, 0.07, 1);
@@ -164,7 +164,7 @@
 
         .cursor-trail {
             width: var(--cursor-trail-size); height: var(--cursor-trail-size);
-            border: 1px solid rgba(245, 238, 220, 0.5); /* Isto seria ideal com currentColor, mas mix-blend-mode é sensível. Vamos manter a base clara */
+            border: 1px solid rgba(245, 238, 220, 0.5); 
             transition: width 0.3s, height 0.3s, border-color 0.3s;
             z-index: 10004;
         }
@@ -659,8 +659,12 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 <h2 id="page-title" class="text-5xl md:text-8xl font-display italic text-[var(--primary)] mb-8 solar-text transition-colors duration-1000" aria-live="polite"></h2>
             </div>
             
-            <div class="w-full h-[50vh] md:h-[70vh] overflow-hidden border border-white/10 relative group">
-                <img id="page-image" src="" class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" alt="Fotografia de arte da coleção">
+            <!-- ALTERADO: Estrutura que suporta imagem, vídeo nativo E iframe do Vimeo -->
+            <div class="w-full h-[50vh] md:h-[70vh] overflow-hidden border border-white/10 relative group bg-[#0d0c0b]">
+                <img id="page-image" src="" class="absolute inset-0 w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" alt="Fotografia de arte da coleção">
+                <video id="page-video" src="" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105 hidden pointer-events-none"></video>
+                <!-- NOVO: Iframe preparado para cobrir o fundo com escala de 115% para esconder barras pretas laterais -->
+                <iframe id="page-iframe" src="" frameborder="0" allow="autoplay; fullscreen" class="absolute inset-0 w-full h-full scale-[1.15] grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-125 hidden pointer-events-none"></iframe>
             </div>
 
             <div class="flex flex-col items-center">
@@ -847,13 +851,15 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 year: "DROP '26", tag: "CÁPSULA ESPECIAL",
                 image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=2670&auto=format&fit=crop", 
                 pageImage: "https://i.postimg.cc/bNJsDKdt/digital_art_eclipse_clouds_berserk_wallpaper_preview_Copia.jpg", 
+                // NOVO: Link do Vimeo configurado como "background=1" para sumir interface
+                pageVideo: "https://player.vimeo.com/video/1169350461?background=1&autoplay=1&loop=1&muted=1",
                 extraImages: [
                     "https://i.postimg.cc/yYdkgwWc/1405de4e5c788d83fe2eff9e4a7ef3a3_be80a14f7660996cb117017327600989_1024_1024.webp",
                     "https://i.postimg.cc/CL1zBWdD/3616cf8650e3b2a04381c9d03264f1cf_5811569d84ab3cfc1c17017327607027_1024_1024.webp"
                 ],
                 ctaText: "Sobreviver ao\nEclipse",
                 themeTrigger: "berserk", 
-                themeMusic: "https://anonymous-fuchsia-xkrni71i0g.edgeone.app/Berserk_soundtrack_-_4_Gatsu_(mp3.pm).mp3" // NOVO LINK DIRETO DO MP3 AQUI
+                themeMusic: "https://anonymous-fuchsia-xkrni71i0g.edgeone.app/Berserk_soundtrack_-_4_Gatsu_(mp3.pm).mp3" 
             },
             {
                 title: "Páginas Literárias",
@@ -1451,8 +1457,38 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 document.getElementById('page-tag').innerText = proj.tag;
                 document.getElementById('page-tag').dataset.value = proj.tag;
                 
-                // NOVO: Se o projeto tiver uma 'pageImage' específica, usa ela. Senão, cai para a padrão.
-                document.getElementById('page-image').src = proj.pageImage || proj.image;
+                // LÓGICA DE CAPA (VÍDEO NATIVO VS IFRAME VIMEO VS IMAGEM)
+                const pageImage = document.getElementById('page-image');
+                const pageVideo = document.getElementById('page-video');
+                const pageIframe = document.getElementById('page-iframe');
+                
+                if (proj.pageVideo) {
+                    if (proj.pageVideo.includes('vimeo.com') || proj.pageVideo.includes('youtube.com')) {
+                        // É um Iframe (Ex: Vimeo)
+                        pageIframe.src = proj.pageVideo;
+                        pageIframe.classList.remove('hidden');
+                        pageVideo.classList.add('hidden');
+                        pageImage.classList.add('hidden');
+                        pageVideo.pause();
+                    } else {
+                        // É um Vídeo Nativo MP4
+                        pageVideo.src = proj.pageVideo;
+                        pageVideo.classList.remove('hidden');
+                        pageIframe.classList.add('hidden');
+                        pageImage.classList.add('hidden');
+                        pageIframe.src = "";
+                        pageVideo.play().catch(e => console.warn("Autoplay bloqueado pelo navegador:", e));
+                    }
+                } else {
+                    // É uma Imagem
+                    pageVideo.classList.add('hidden');
+                    pageIframe.classList.add('hidden');
+                    pageVideo.pause();
+                    pageVideo.src = "";
+                    pageIframe.src = "";
+                    pageImage.classList.remove('hidden');
+                    pageImage.src = proj.pageImage || proj.image;
+                }
 
                 const gallery = document.getElementById('page-gallery');
                 gallery.innerHTML = '';
@@ -1919,6 +1955,9 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 SoundManager.playClick();
                 isDedicatedPageOpen = false; 
                 const page = document.getElementById('dedicated-page');
+                const pageVideo = document.getElementById('page-video');
+                const pageIframe = document.getElementById('page-iframe');
+                
                 page.style.opacity = 0;
                 page.style.pointerEvents = 'none';
                 page.setAttribute('aria-hidden', 'true');
@@ -1926,6 +1965,8 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                 // RETORNO AO TEMA PADRÃO E PARAR MÚSICA AO FECHAR PROJETO TEMÁTICO
                 applyTheme('default');
                 SoundManager.stopThemeMusic();
+                if(pageVideo) pageVideo.pause();
+                if(pageIframe) pageIframe.src = ""; // Limpa o iframe para parar o vídeo
 
                 setTimeout(() => {
                     page.style.display = 'none';
@@ -2018,13 +2059,17 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
                             }
 
                             const page = document.getElementById('dedicated-page');
+                            const pageVideo = document.getElementById('page-video');
+                            const pageIframe = document.getElementById('page-iframe');
                             page.style.opacity = 0;
                             
                             setTimeout(() => {
                                 if(flash) { flash.style.transition = "opacity 1.0s ease-in-out"; flash.style.opacity = 0; }
-                                // RETORNA O TEMA PADRÃO E PARA MÚSICA AO FINALIZAR PEDIDO
+                                // RETORNA O TEMA PADRÃO, PARA MÚSICA E VÍDEO AO FINALIZAR PEDIDO
                                 applyTheme('default');
                                 SoundManager.stopThemeMusic();
+                                if(pageVideo) pageVideo.pause();
+                                if(pageIframe) pageIframe.src = ""; // Limpa o iframe
                             }, 100);
 
                             setTimeout(() => {
