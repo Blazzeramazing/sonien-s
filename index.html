@@ -38,6 +38,7 @@
             --my: 0;
         }
 
+        /* OTIMIZAÇÃO DE TRANSIÇÃO: Permite que a mudança de tema (Cores) seja suave */
         body, #dedicated-page, .modal-content {
             transition: background-color 1s ease, color 1s ease;
         }
@@ -148,7 +149,7 @@
             80% { transform: translate(2px, -2px); opacity: 0.03; }
         }
 
-        /* EFEITO ATMOSFÉRICO DE FUMAÇA (NOVO) */
+        /* EFEITO ATMOSFÉRICO DE FUMAÇA */
         @keyframes smokeDrift {
             0% { transform: translate3d(0, 0, 0) scale(2); opacity: 0.05; }
             50% { opacity: 0.15; }
@@ -742,8 +743,8 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
         
         <!-- ECLIPSE FX OVERLAY -->
         <div id="eclipse-fx" class="fixed inset-0 pointer-events-none z-[10005] hidden opacity-0 transition-opacity duration-1000">
-            <!-- Luar Avermelhado -->
-            <div class="absolute top-0 left-0 w-full h-[60vh] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#9b111e]/50 via-[#9b111e]/10 to-transparent mix-blend-screen"></div>
+            <!-- Luar Avermelhado CORRIGIDO para h-full sem cortes -->
+            <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#9b111e]/50 via-[#9b111e]/10 to-transparent mix-blend-screen"></div>
             <!-- Fumaça -->
             <div class="absolute inset-0 opacity-20 mix-blend-screen animate-smoke pointer-events-none"></div>
             <!-- Container de Faíscas -->
