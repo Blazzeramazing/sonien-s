@@ -157,9 +157,10 @@
         }
         .animate-smoke {
             animation: smokeDrift 20s ease-in-out infinite alternate;
-            will-change: transform, opacity;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.015' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-            filter: blur(20px) contrast(2) saturate(0);
+            will-change: transform; /* Otimizado: Removido opacity do will-change para evitar repaints excessivos */
+            /* Otimizado: numOctaves reduzido para 2 para gerar um SVG mais leve */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.015' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            /* Otimizado: filter blur() pesado removido. O SVG agora encarrega-se da textura suave nativamente */
         }
 
         .cursor-dot, .cursor-trail {
@@ -672,9 +673,12 @@ Onde a criatividade encontra o estilo, nós forjamos a sua identidade."></p>
             </div>
             
             <div class="w-full h-[50vh] md:h-[70vh] overflow-hidden border border-white/10 relative group bg-[#0d0c0b]">
+                <!-- A imagem mantém os efeitos visuais, pois é estática e não pesa -->
                 <img id="page-image" src="" class="absolute inset-0 w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" alt="Fotografia de arte da coleção">
-                <video id="page-video" src="" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105 hidden pointer-events-none"></video>
-                <iframe id="page-iframe" src="" frameborder="0" allow="autoplay; fullscreen" class="absolute inset-0 w-full h-full scale-[1.15] grayscale-[40%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-125 hidden pointer-events-none"></iframe>
+                
+                <!-- OTIMIZADO: Removidos grayscale e transforms do vídeo e iframe para garantir 60fps constantes -->
+                <video id="page-video" src="" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover hidden pointer-events-none"></video>
+                <iframe id="page-iframe" src="" frameborder="0" allow="autoplay; fullscreen" class="absolute inset-0 w-full h-full scale-[1.15] hidden pointer-events-none"></iframe>
             </div>
 
             <div class="flex flex-col items-center">
